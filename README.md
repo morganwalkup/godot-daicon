@@ -43,8 +43,8 @@ Simulating 3D depth for a 2D game usually means picking between two established,
 
 ## Installation
 
-1. Download or clone this repository.
-2. Copy the `addons/daicon` folder into the `addons/` folder of your own Godot project.
+1. Download or clone this repository. The repository root is the addon.
+2. Put the repository at `addons/daicon` in your own Godot project (copy it, or add it as a git submodule).
 3. In Godot, go to **Project → Project Settings → Plugins**, and enable **Daicon**.
 
 > [!NOTE]
@@ -59,10 +59,25 @@ Simulating 3D depth for a 2D game usually means picking between two established,
 
 1. Add a `Daicon`-family node (e.g. `KinematicDaicon`) to your scene.
 2. Position it in 3D space — Daicon handles projecting it correctly onto the 2D view.
-3. Check the `example/` folder in this repository for a working demo scene (`example.tscn`) using every node type.
+3. Check the `examples/` folder in this repository for a working demo scene (`example.tscn`) using every node type.
 
 > [!NOTE]
 > Full docs, guides, and API reference: [daicon-docs.readthedocs.io](https://daicon-docs.readthedocs.io/en/latest/)
+
+---
+
+## Changes in this fork
+
+This fork is used by Kinsprit. It differs from upstream Daicon:
+
+- The repository root is the addon, so it mounts at `addons/daicon`. `blocks.blend` and `blocks.tscn` are in `mesh/source/` behind a `.gdignore`, so a project imports `mesh/blocks.tres` without Blender.
+- `DaiconEntity` and the map GridMaps use global 2D positions. Maps and entities under an offset parent collide in the correct place.
+- The TileSet `Item` custom data layer can be a String (a MeshLibrary item name). An empty value means no block. Int layers still work.
+- `DaiconMapLayer` gets its level from `z_index` / `z_step` (as `DaiconMap` does), or from an explicit `level` when `level_from_z_index` is off. `cell_offset` is an export (upstream default `(0, 0, -0.5)`).
+- Maps rebuild when cells change, and when `level` or `z_step` changes.
+- `extrude_physics` turns the 2D tile physics polygons into 3D walls on `extrusion_layer`. `disable_2d_collision` (on by default) turns off the 2D physics of the layer at runtime.
+- The whisker uses the lowest z of all overlapping occluders and skips the entity's own body. The entity `mask` uses 3D physics flags.
+- `DaiconMapBuilder` holds the map build code that `DaiconMap` and `DaiconMapLayer` share.
 
 ---
 
