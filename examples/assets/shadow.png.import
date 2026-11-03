@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://1dtkll3jibsk"
-path="res://.godot/imported/basic.png-79ac39b4d92184fa6cd5fa6c49b26470.ctex"
+uid="uid://rvj40e0hpbx3"
+path="res://.godot/imported/shadow.png-6302c00ea5b4149d425da41c5e94895f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://example/assets/basic.png"
-dest_files=["res://.godot/imported/basic.png-79ac39b4d92184fa6cd5fa6c49b26470.ctex"]
+source_file="res://addons/daicon/examples/assets/shadow.png"
+dest_files=["res://.godot/imported/shadow.png-6302c00ea5b4149d425da41c5e94895f.ctex"]
 
 [params]
 

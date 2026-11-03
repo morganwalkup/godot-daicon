@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://rvj40e0hpbx3"
-path="res://.godot/imported/shadow.png-6302c00ea5b4149d425da41c5e94895f.ctex"
+uid="uid://c6u4mv2ecvtel"
+path="res://.godot/imported/tileset.png-38ab2d8137567465c4b4d5cfc3661db5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://example/assets/shadow.png"
-dest_files=["res://.godot/imported/shadow.png-6302c00ea5b4149d425da41c5e94895f.ctex"]
+source_file="res://addons/daicon/examples/assets/tileset.png"
+dest_files=["res://.godot/imported/tileset.png-38ab2d8137567465c4b4d5cfc3661db5.ctex"]
 
 [params]
 

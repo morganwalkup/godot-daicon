@@ -1,5 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://danxqtmwyagwn"]
-
-[ext_resource type="PackedScene" uid="uid://b5sdpxhwm5e1x" path="res://addons/daicon/mesh/blocks.blend" id="1_6hmc7"]
-
-[node name="blocks" instance=ExtResource("1_6hmc7")]
