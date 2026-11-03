@@ -29,7 +29,7 @@ var shader_cast: RayCast3D
 	set(value):
 		if core:
 			core.position.y = value + offset_3d.y
-			position.y = ((core.position.z - offset_3d.z) - (core.position.y - offset_3d.y)) * tile_size
+			_set_position_2d(Vector2(_get_position_2d().x, ((core.position.z - offset_3d.z) - (core.position.y - offset_3d.y)) * tile_size))
 		y_3d = value
 	get(): return y_3d
 
@@ -128,7 +128,7 @@ const basis_properties: Array[StringName] = [&"rotation_3d", &"scale_3d", &"quat
 		layer = collision_layer
 	get(): return layer
 
-@export_flags_3d_navigation var mask: int = 1:
+@export_flags_3d_physics var mask: int = 1:
 	set(collision_mask):
 		if core: core.collision_mask = collision_mask
 		mask = collision_mask
@@ -236,30 +236,52 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if Engine.is_editor_hint():
 		if not core: _expand()
-		if position.x != (core.position.x - offset_3d.x) * tile_size: core.position.x = (position.x / tile_size) + offset_3d.x
-		if position.y != ((core.position.z - offset_3d.z) - (core.position.y - offset_3d.y)) * tile_size: core.position.z = ((position.y / tile_size) + (core.position.y - offset_3d.y)) + offset_3d.z
+		var position_2d := _get_position_2d()
+		if position_2d.x != (core.position.x - offset_3d.x) * tile_size: core.position.x = (position_2d.x / tile_size) + offset_3d.x
+		if position_2d.y != ((core.position.z - offset_3d.z) - (core.position.y - offset_3d.y)) * tile_size: core.position.z = ((position_2d.y / tile_size) + (core.position.y - offset_3d.y)) + offset_3d.z
 
 
 func update_pos(coef: float = 0.0) -> void:
 	if coef == 0.0:  coef = z_sort_coef
 	
-	position.x = (core.position.x - offset_3d.x) * tile_size
-	position.y = ((core.position.z - offset_3d.z) - (core.position.y - offset_3d.y)) * tile_size
+	_set_position_2d(Vector2(
+		(core.position.x - offset_3d.x) * tile_size,
+		((core.position.z - offset_3d.z) - (core.position.y - offset_3d.y)) * tile_size))
 	
-	if whisker and whisker.get_overlapping_bodies():
-		var bodies = whisker.get_overlapping_bodies()
-		if not bodies.is_empty():
-			var first_body = bodies[0]
-			if first_body.has_meta("z_index"):
-				z_index = first_body.get_meta("z_index") - 1
+	var bodies: Array[Node3D] = whisker.get_overlapping_bodies() if whisker else ([] as Array[Node3D])
+	if not bodies.is_empty():
+		# The lowest z of all occluders wins, so the entity draws under every one of them.
+		var lowest := z_index_for_height(core.position.y - offset_3d.y, coef)
+		for body in bodies:
+			if body == core: continue
+			var occluder_z: int
+			if body.has_meta("z_index"):
+				occluder_z = int(body.get_meta("z_index")) - 1
 			else:
 				var snapped_y := snappedf(core.position.y, 0.01)
-				z_index = int(snapped_y + (offset_3d.y * 1.1)) * z_step - 1
+				occluder_z = int(snapped_y + (offset_3d.y * 1.1)) * z_step - 1
+			lowest = mini(lowest, occluder_z)
+		z_index = lowest
 	else:
-		var snapped_local_y := snappedf(core.position.y - offset_3d.y, 0.01)
-		z_index = int((snapped_local_y + coef) * z_step + 2)
+		z_index = z_index_for_height(core.position.y - offset_3d.y, coef)
 	
 	core.set_meta("z_index", z_index)
+
+
+## Returns the z_index of an entity that stands at a height (in blocks), with no occluder.
+func z_index_for_height(height: float, coef: float = 0.0) -> int:
+	if coef == 0.0: coef = z_sort_coef
+	return int((snappedf(height, 0.01) + coef) * z_step + 2)
+
+
+## Returns the 2D position that mirrors the 3D core: global if in the tree, else local.
+func _get_position_2d() -> Vector2:
+	return global_position if is_inside_tree() else position
+
+
+func _set_position_2d(value: Vector2) -> void:
+	if is_inside_tree(): global_position = value
+	else: position = value
 
 
 func _validate_property(property: Dictionary) -> void:
@@ -357,9 +379,10 @@ func _init_core() -> void:
 	core.axis_lock_angular_y = angular_y
 	core.axis_lock_angular_z = angular_z
 	
+	var position_2d := _get_position_2d()
 	core.position.y = y_3d + offset_3d.y
-	core.position.x = (position.x / tile_size) + offset_3d.x
-	core.position.z = ((position.y / tile_size) + (core.position.y - offset_3d.y)) + offset_3d.z
+	core.position.x = (position_2d.x / tile_size) + offset_3d.x
+	core.position.z = ((position_2d.y / tile_size) + (core.position.y - offset_3d.y)) + offset_3d.z
 	core.scale = scale_3d
 	
 	if rotation_edit_mode_3d == 0:   core.rotation = rotation_3d

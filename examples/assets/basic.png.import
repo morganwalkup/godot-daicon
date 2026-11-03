@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://1dtkll3jibsk"
-path="res://.godot/imported/basic.png-79ac39b4d92184fa6cd5fa6c49b26470.ctex"
+path="res://.godot/imported/basic.png-cb9828c6a9f288f697c3fbced41b0e86.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://addons/daicon/examples/assets/basic.png"
-dest_files=["res://.godot/imported/basic.png-79ac39b4d92184fa6cd5fa6c49b26470.ctex"]
+dest_files=["res://.godot/imported/basic.png-cb9828c6a9f288f697c3fbced41b0e86.ctex"]
 
 [params]
 
