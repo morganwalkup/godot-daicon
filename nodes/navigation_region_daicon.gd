@@ -33,8 +33,11 @@ const POLL_SECONDS: float = 2.0
 @export_custom(PROPERTY_HINT_NONE, "suffix:blocks") var cell_height: float = 0.05
 ## Less than the 1-block clearance under a deck, so agents fit under it.
 @export_custom(PROPERTY_HINT_NONE, "suffix:blocks") var agent_height: float = 0.9
-## Less than the 6 px body radius, or the 1-block ramps erode away.
-@export_custom(PROPERTY_HINT_NONE, "suffix:blocks") var agent_radius: float = 0.25
+## At most one cell_size. The voxelization can make a thin wall up to one cell thicker on each side,
+## so a gap that a 6 px body just fits through (0.75 blocks) can shrink to 0.5 blocks. A larger
+## radius erodes that gap shut, and the navmesh splits where the body can walk (a 0.8-block gate
+## in the forest). The body is wider than the agent and slides along the walls.
+@export_custom(PROPERTY_HINT_NONE, "suffix:blocks") var agent_radius: float = 0.125
 ## At least cell_size: a 45° ramp rises cell_size per cell. Much less than any ledge.
 @export_custom(PROPERTY_HINT_NONE, "suffix:blocks") var agent_max_climb: float = 0.15
 @export_range(0.0, 90.0, 0.1, "degrees") var agent_max_slope: float = 50.0
