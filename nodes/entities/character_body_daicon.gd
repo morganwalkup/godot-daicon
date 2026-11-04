@@ -28,6 +28,7 @@ var navigation_agent: NavigationAgent3D
 var _moved_frame: int = -1
 var _await_floor_frames: int = 0
 var _position_delta: Vector2 = Vector2.ZERO
+var _requested_velocity: Vector2 = Vector2.ZERO
 
 @export var motion_mode: CharacterBody3D.MotionMode = CharacterBody3D.MOTION_MODE_GROUNDED:
 	set(value):
@@ -252,6 +253,49 @@ func get_last_slide_collision() -> KinematicCollisionDaicon:
 #endregion
 
 
+## Moves the body by a ground-plane motion in px, as a push from another body. It does not change
+## `velocity`. It slides along walls, floors, and ramps as move_and_slide() does. It does nothing in
+## the air, and it does not push the body off a ledge: the move is undone when no floor is under
+## the new position. Returns the motion done, in px.
+func push(motion: Vector2) -> Vector2:
+	if Engine.is_editor_hint() or not core or not is_on_floor() or motion == Vector2.ZERO:
+		return Vector2.ZERO
+	_apply_position_write()
+	var body := _body()
+	var start := body.global_transform
+	var saved_velocity := body.velocity
+	# A move_and_collide() along the floor stops at once when safe_margin is small, so slide instead.
+	body.velocity = Vector3(motion.x, 0.0, motion.y) / tile_size / get_physics_process_delta_time()
+	body.move_and_slide()
+	body.velocity = saved_velocity
+	if not _has_floor_below():
+		body.global_transform = start
+	_sync_from_core()
+	return _ground(body.global_position - start.origin) * tile_size
+
+
+## Pushes the CharacterBodyDaicon bodies that the last move_and_slide() ran into, with push().
+## A body is pushed only if it is on `layer_mask`, it is at the same level (see same_level()), and
+## the requested velocity of this body points into it. The push is along the contact normal, at
+## `push_speed` px/s or at the requested speed into the body if that is lower.
+func push_slide_colliders(push_speed: float, layer_mask: int) -> void:
+	if Engine.is_editor_hint() or not core:
+		return
+	var step: float = get_physics_process_delta_time()
+	var pushed: Array[Object] = []
+	for i: int in get_slide_collision_count():
+		var hit := get_slide_collision(i)
+		var other := hit.get_collider() as CharacterBodyDaicon
+		if other == null or other == self or pushed.has(other) or other.collision_layer & layer_mask == 0 or not same_level(self, other):
+			continue
+		var direction: Vector2 = -hit.get_normal()
+		var speed: float = minf(push_speed, _requested_velocity.dot(direction))
+		if direction == Vector2.ZERO or speed <= 0.0:
+			continue
+		pushed.append(other)
+		other.push(direction * speed * step)
+
+
 ## Starts an upward move, in blocks/s. Does nothing in the air.
 func jump(speed: float) -> void:
 	if is_on_floor():
@@ -276,6 +320,7 @@ func _slide(delta: float) -> bool:
 	if use_gravity: apply_gravity(delta)
 	var body := _body()
 	var before := _get_position_2d()
+	_requested_velocity = velocity
 	body.velocity = Vector3(velocity.x / tile_size, vertical_velocity, velocity.y / tile_size)
 	var collided := body.move_and_slide()
 	velocity = _ground(body.velocity) * tile_size
