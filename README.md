@@ -1,4 +1,4 @@
-![Daicon](addons/daicon/press_kit/1-5%20version.png)
+![Daicon](press_kit/1-5%20version.png)
 
 # Daicon
 

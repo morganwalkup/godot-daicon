@@ -1,4 +1,3 @@
-#addons/daicon/nodes/daicon_entity_node.gd
 @tool
 @icon("res://addons/daicon/icons/daicon.svg")
 class_name DaiconEntity extends Node2D
@@ -34,14 +33,10 @@ var shader_cast: RayCast3D
 	get(): return y_3d
 
 ## Z-step in sortable system between height levels.
-@export var z_step: int = 10:
-	set(step): z_step = step
-	get(): return z_step
+@export var z_step: int = 10
 
 ## Object max 3D height in blocks (meters). Used in sortable system as coef.
-@export var z_sort_coef: float = 1.0:
-	set(coef): z_sort_coef = coef
-	get(): return z_sort_coef
+@export var z_sort_coef: float = 1.0
 #endregion
 
 
@@ -242,7 +237,7 @@ func _process(_delta: float) -> void:
 
 
 func update_pos(coef: float = 0.0) -> void:
-	if coef == 0.0:  coef = z_sort_coef
+	if coef == 0.0: coef = z_sort_coef
 	
 	_set_position_2d(Vector2(
 		(core.position.x - offset_3d.x) * tile_size,
@@ -362,7 +357,6 @@ func _init_core() -> void:
 	core = _create_core()
 	add_child(core)
 	move_child(core, 0)
-	core = get_child(0)
 	
 	core.disable_mode = disable_mode_3d
 	core.collision_layer = layer

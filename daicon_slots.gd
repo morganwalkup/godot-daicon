@@ -2,12 +2,12 @@
 class_name DaiconSlots extends RefCounted
 
 ## Utility for serializing/deserializing Godot nodes to and from Dictionary form.
-## Used by DaiconEntity's "slot" system (whisker/shape/shader_cast) to store a node's
-## full state (script, properties, meta, optionally children) so it can be ejected
+## Used by DaiconEntity's "slot" system (mesh/shape/whisker/whisker_shape/shader_cast) to store
+## a node's full state (script, properties, meta, optionally children) so it can be ejected
 ## from the scene tree and later reconstructed identically.
 
-# Исключаем только взаимоисключающие матрицы 
-# (оставляя чистые position/rotation/scale) и служебные поля
+# Skips only the transform forms that conflict with each other (position/rotation/scale stay)
+# and internal fields.
 const _CONFLICTING_PROPERTIES := {
 	"script": true,
 	"name": true,
@@ -36,15 +36,14 @@ static func safe_reparent(node: Node, new_parent: Node) -> void:
 ## dropped — only plain data and Resource values survive the round-trip.
 ## If [param recursive] is true, child nodes are serialized as a nested tree.
 static func serialize_node(node: Node, recursive: bool = false) -> Dictionary:
-	if not node: return {} # Защита от пустой ноды
+	if not node: return {}
 	
-	# Получаем путь к кастомному скрипту, если он прикреплен
 	var script_path := ""
 	var script_res := node.get_script() as Script
 	if script_res and not script_res.resource_path.is_empty(): script_path = script_res.resource_path
 	
-	# Чистим имя ТОЛЬКО если оно строго соответствует автогенерируемому формату Godot (@Class@N).
-	# Пользовательские имена с "@" внутри (редкий, но валидный кейс) не трогаем.
+	# Clean the name ONLY if it matches Godot's auto-generated format (@Class@N) exactly.
+	# User names that contain "@" (rare, but valid) stay as they are.
 	var clean_name: String = node.name
 	if _get_auto_name_rx().search(clean_name):
 		var at_parts = clean_name.split("@")
@@ -53,7 +52,6 @@ static func serialize_node(node: Node, recursive: bool = false) -> Dictionary:
 				clean_name = part
 				break
 	
-	# Базовый паспорт сохраняемой ноды
 	var data: Dictionary = {
 		"Name": clean_name,
 		"Class": node.get_class(),
@@ -62,27 +60,23 @@ static func serialize_node(node: Node, recursive: bool = false) -> Dictionary:
 		"Meta": {}
 		}
 	
-	# 1: Сохраняем все пользовательские метаданные (set_meta)
 	for meta_key in node.get_meta_list():
 		if String(meta_key).begins_with("_"): continue # Skip editor-internal meta (e.g. _edit_lock_)
 		data.Meta[meta_key] = node.get_meta(meta_key)
 	
-	# 2: Перебираем и сохраняем свойства ноды
 	for prop in node.get_property_list():
 		var p_name: String = prop.name
 		var p_usage: int = prop.usage
 		
+		if _CONFLICTING_PROPERTIES.has(p_name): continue
+		if p_usage & PROPERTY_USAGE_READ_ONLY: continue # Setting these back would only print errors.
 		
-		if _CONFLICTING_PROPERTIES.has(p_name): continue # Пропускаем конфликтующие матрицы и служебные дубликаты
-		if p_usage & PROPERTY_USAGE_READ_ONLY: continue # Пропускаем свойства "только для чтения", чтобы не спамить ошибками
-		
-		# Сохраняем только то, что настраивается в инспекторе или сохраняется на диск
+		# Keep only what the inspector edits or the scene file stores.
 		if (p_usage & PROPERTY_USAGE_STORAGE) or (p_usage & PROPERTY_USAGE_EDITOR):
 			var val = node.get(p_name)
-			# Исключаем ссылки на другие ноды сцены (сохраняем только чистые данные и Resource)
+			# Drop references to other scene nodes: keep plain data and Resources only.
 			if val != null and not (val is Object and not val is Resource): data.Properties[p_name] = val
 	
-	# 3: Рекурсивно обходим всех детей, если включен флаг Deep Tree
 	if recursive and node.get_child_count() > 0:
 		var children_arr: Array[Dictionary] = []
 		for child in node.get_children():
@@ -99,38 +93,36 @@ static func serialize_node(node: Node, recursive: bool = false) -> Dictionary:
 ## textures/shaders stay shared) — this avoids accidental memory bloat while still
 ## giving each node its own Resource instance.
 static func deserialize_node(dict: Dictionary, make_unique: bool = false) -> Node:
-	if dict.is_empty(): return null # Защита от пустого словаря
+	if dict.is_empty(): return null
 	
 	var node: Node = null
 	var script_path: String = dict.get("Script", "")
 	var class_name_str: String = dict.get("Class", "Node")
 	
-	# 1: Пытаемся создать ноду через кастомный скрипт (если файл есть на диске)
+	# 1: Instantiate the custom script, if the file exists.
 	if not script_path.is_empty() and ResourceLoader.exists(script_path):
 		var script_res := load(script_path) as Script
 		if script_res and script_res.can_instantiate(): node = script_res.new() as Node
 	
-	# 2: Безопасный Fallback на базовый класс движка (если скрипта нет на компьютере)
+	# 2: Fall back to the engine base class if the script is missing.
 	if not node and not class_name_str.is_empty() and ClassDB.class_exists(class_name_str):
 		node = ClassDB.instantiate(class_name_str) as Node
 		if not script_path.is_empty(): push_warning("[DaiconSlots] Script missing on disk ('%s'). Safe fallback to '%s'." % [script_path, class_name_str])
 	
-	# 3: Аварийная заглушка (если даже класс неизвестен)
+	# 3: Last resort if even the class is unknown.
 	if not node: node = Node.new()
 	
-	node.name = dict.get("Name", "SlotNode") # Восстанавливаем оригинальное чистое имя
+	node.name = dict.get("Name", "SlotNode")
 	
-	# 4: Восстанавливаем все метаданные
 	var meta_dict: Dictionary = dict.get("Meta", {})
 	for meta_key in meta_dict:
 		node.set_meta(meta_key, meta_dict[meta_key])
 	
-	# 5: Накатываем значения всех сохраненных свойств.
-	# Свойства, которых больше нет у целевого класса (скрипт успели отредактировать
-	# после сохранения) — пропускаем с предупреждением, а не тихо и не с ошибкой.
+	# A stored property that the class no longer has (the script changed after the save)
+	# is skipped with a warning, not silently and not with an error.
 	var props: Dictionary = dict.get("Properties", {})
 	if not props.is_empty():
-		var valid_names := {} # Строим один раз, чтобы не листать property_list на каждое свойство.
+		var valid_names := {} # Built once, so the property list is not scanned for every property.
 		for p in node.get_property_list(): valid_names[p.name] = true
 		
 		for p_name in props:
@@ -140,12 +132,10 @@ static func deserialize_node(dict: Dictionary, make_unique: bool = false) -> Nod
 			
 			var val = props[p_name]
 			
-			# Если включена уникализация — глубоко клонируем ресурсы, массивы и словари
 			if make_unique: val = _make_value_unique(val)
 			
 			node.set(p_name, val)
 	
-	# 6: Рекурсивно создаем и прикрепляем дочерние ноды
 	if dict.has("Children"):
 		for child_dict in dict["Children"]:
 			var child_node := deserialize_node(child_dict, make_unique)
@@ -156,14 +146,13 @@ static func deserialize_node(dict: Dictionary, make_unique: bool = false) -> Nod
 
 ## Unpacks a node from Dictionary, attaches it to [param parent], and sets editor ownership recursively.
 static func expand_slot(properties: Dictionary, parent: Node, make_unique: bool = false) -> Node:
-	if properties.is_empty() or not parent: return null # Защита от пустых данных / отсутствия родителя
+	if properties.is_empty() or not parent: return null
 	
-	# Разворачиваем готовую ноду из данных
 	var node := deserialize_node(properties, make_unique)
 	if node:
-		parent.add_child(node, true) # Добавляем в дерево к родителю (force_readable_name гарантирует чистое имя)
+		parent.add_child(node, true) # force_readable_name keeps the name clean.
 		
-		# В режиме редактора рекурсивно назначаем владельца (owner) всей цепочке детей
+		# In the editor, the scene root must own every node, or the nodes are lost on save.
 		if Engine.is_editor_hint() and parent.is_inside_tree():
 			var tree := parent.get_tree()
 			if tree and tree.edited_scene_root: _set_owner_recursive(node, tree.edited_scene_root)

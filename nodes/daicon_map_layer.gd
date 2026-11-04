@@ -20,10 +20,10 @@ var _built_level := 0
 	get():
 		return mesh_library
 @export var physics_material : PhysicsMaterial:
-	set(library):
-		if grid_map: grid_map.physics_material = library
-		if extrusion: extrusion.physics_material_override = library
-		physics_material = library
+	set(material):
+		if grid_map: grid_map.physics_material = material
+		if extrusion: extrusion.physics_material_override = material
+		physics_material = material
 	get():
 		return physics_material
 @export var visible_3d: bool = true:
@@ -125,7 +125,7 @@ var _built_level := 0
 		bake_navigation = value
 	get():
 		return bake_navigation
-@export_group("Transorm")
+@export_group("Transform")
 @export_custom(PROPERTY_HINT_RANGE, "-360,360,0.1,or_less,or_greater,radians") var rotation_3d: Vector3 = Vector3(0, 0, 0):
 	set(v_3):
 		if grid_map: grid_map.rotation = v_3
@@ -203,7 +203,7 @@ func _sync_origin() -> void:
 	if grid_map: grid_map.position = origin
 	if extrusion: extrusion.position = origin
 
-func update_grid_map():
+func update_grid_map() -> void:
 	_dirty = false
 	if not grid_map: return
 	grid_map.clear()

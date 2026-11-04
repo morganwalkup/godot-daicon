@@ -19,10 +19,10 @@ var _layer_levels: Dictionary = {}
 	get():
 		return mesh_library
 @export var physics_material : PhysicsMaterial:
-	set(library):
-		if grid_map: grid_map.physics_material = library
-		if extrusion: extrusion.physics_material_override = library
-		physics_material = library
+	set(material):
+		if grid_map: grid_map.physics_material = material
+		if extrusion: extrusion.physics_material_override = material
+		physics_material = material
 	get():
 		return physics_material
 ## Z-step in sortable system between height levels.
@@ -92,7 +92,7 @@ var _layer_levels: Dictionary = {}
 		bake_navigation = value
 	get():
 		return bake_navigation
-@export_group("Transorm")
+@export_group("Transform")
 @export_custom(PROPERTY_HINT_RANGE, "-360,360,0.1,or_less,or_greater,radians") var rotation_3d: Vector3 = Vector3(0, 0, 0):
 	set(v_3):
 		if grid_map: grid_map.rotation = v_3
@@ -181,14 +181,14 @@ func get_cells() -> int:
 		if child is TileMapLayer: count += len(child.get_used_cells())
 	return count
 
-func update_grid_map():
+func update_grid_map() -> void:
 	_dirty = false
 	if not grid_map: return
 	grid_map.clear()
 	if extrusion: DaiconMapBuilder.clear_extrusion(extrusion)
 	_layer_levels.clear()
 	for layer_index in range(0, get_layers_count()):
-		var z = get_layer_z_index(layer_index) / z_step
+		var z: int = get_layer_z_index(layer_index) / z_step if z_step != 0 else 0
 		for tile in get_used_cells(layer_index):
 			var item := DaiconMapBuilder.item_for(tile_set, get_cell_tile_data(layer_index, tile), mesh_library)
 			if item < 0: continue

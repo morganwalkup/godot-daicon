@@ -55,9 +55,9 @@ class_name KinematicDaicon extends DaiconEntity
 	get(): return max_angle_3d
 
 @export_range(0, 1, 0.01, "or_greater", "suffix:m") var snap_length_3d: float = 0.1:
-	set(angle):
-		if core: (core as CharacterBody3D).floor_snap_length = angle
-		snap_length_3d = angle
+	set(length):
+		if core: (core as CharacterBody3D).floor_snap_length = length
+		snap_length_3d = length
 	get(): return snap_length_3d
 
 const grounded_properties: Array[StringName] = [

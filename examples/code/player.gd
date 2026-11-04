@@ -4,20 +4,11 @@ extends KinematicDaicon
 const SPEED = 5
 const JUMP_VELOCITY = 5
 const gravity = 10
-const accelaration = 20
+const acceleration = 20
 @onready var animation_tree : AnimationTree = $AnimationTree
 @onready var animation = animation_tree.get("parameters/playback")
 
 var movement_input := Vector2.ZERO
-
-func _ready() -> void:
-	super._ready()
-	
-func _process(delta: float) -> void:
-	super._process(delta)
-	
-func _validate_property(property: Dictionary) -> void:
-	super._validate_property(property)
 
 func _physics_process(delta: float) -> void:
 	if not Engine.is_editor_hint():
@@ -28,7 +19,7 @@ func _physics_process(delta: float) -> void:
 			set_animation_direction(movement_input)
 		
 		var y_vel = body.velocity.y
-		body.velocity = body.velocity.move_toward(direction * SPEED, accelaration * delta)
+		body.velocity = body.velocity.move_toward(direction * SPEED, acceleration * delta)
 		body.velocity.y = y_vel - gravity * delta
 		
 		if Input.is_action_just_pressed("ui_accept") and body.is_on_floor():
@@ -42,15 +33,13 @@ func player_animation(direction, velocity: Vector3):
 	var body := core as CharacterBody3D
 	if velocity == Vector3.ZERO:
 		animation.travel("Idle")
-	elif velocity != Vector3.ZERO:
-		if direction:
-			if body.is_on_floor():
-				animation.travel("Move")
-			else:
-				animation.travel("Jump")
+	elif direction:
+		if body.is_on_floor():
+			animation.travel("Move")
 		else:
-			if not body.is_on_floor():
-				animation.travel("Jump Down")
+			animation.travel("Jump")
+	elif not body.is_on_floor():
+		animation.travel("Jump Down")
 
 func set_animation_direction(direction):
 	animation_tree.set("parameters/Idle/blend_position", direction)

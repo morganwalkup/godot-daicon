@@ -166,9 +166,8 @@ func _update_shadow_projection() -> void:
 			modulate.a = lerp(shadow_opacity, 0.0, clampf(t, 0.0, 1.0))
 	
 	var floor_level := snappedf(floor_y, 0.01) + 1.0
-	var step := parent_entity.z_step if parent_entity else 10
-	var calculated_z := int(floor_level) * step
-	z_index = min(calculated_z, parent_entity.z_index - 1)
+	var calculated_z := int(floor_level) * parent_entity.z_step
+	z_index = mini(calculated_z, parent_entity.z_index - 1)
 #endregion
 
 

@@ -161,6 +161,7 @@ func _create_core() -> CollisionObject3D:
 	body.physics_material_override = physics_material_override
 	body.gravity_scale = gravity_scale
 	body.center_of_mass_mode = center_of_mass_mode
+	body.center_of_mass = center_of_mass
 	body.inertia = inertia
 	body.sleeping = sleeping
 	body.can_sleep = can_sleep

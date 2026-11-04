@@ -9,6 +9,6 @@ export_presets.cfg
 .DS_Store
 Thumbs.db
 
-# PyCharm / IDE (если работаешь в PyCharm с этим проектом)
+# PyCharm / IDE
 .idea/
 .venv/
