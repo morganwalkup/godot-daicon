@@ -1,5 +1,5 @@
 @tool
-class_name CollisionShapeDaicon extends Node2D
+class_name CollisionShape25D extends Node2D
 ## A 3D shape for its parent Daicon body or area, like CollisionShape2D for a 2D body.
 ## The 2D position is an offset on the ground plane, in px. `offset_3d` adds a 3D offset in blocks
 ## from the feet. At runtime the node puts a CollisionShape3D under the parent's core.
@@ -9,7 +9,7 @@ class_name CollisionShapeDaicon extends Node2D
 enum Role {
 	## A collision shape of the core.
 	COLLISION,
-	## A shape of the draw-order whisker (see CollisionObjectDaicon.whisker).
+	## A shape of the draw-order whisker (see CollisionObject25D.whisker).
 	WHISKER,
 	## A shape of the occluder body: other nodes behind it draw under the parent.
 	OCCLUDER,
@@ -51,8 +51,8 @@ func _notification(what: int) -> void:
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
-	if not get_parent() is CollisionObjectDaicon:
-		warnings.append("CollisionShapeDaicon must be a direct child of a Daicon body or area.")
+	if not get_parent() is CollisionObject25D:
+		warnings.append("CollisionShape25D must be a direct child of a Daicon body or area.")
 	if not shape:
 		warnings.append("A shape must be set.")
 	return warnings
@@ -60,8 +60,8 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 ## Puts the 3D shape under the parent's core. The parent calls it after it builds its core.
 func attach() -> void:
-	var parent := get_parent() as CollisionObjectDaicon
-	if not parent or CollisionObjectDaicon.is_placeholder(parent) or not parent.core or not shape: return
+	var parent := get_parent() as CollisionObject25D
+	if not parent or CollisionObject25D.is_placeholder(parent) or not parent.core or not shape: return
 	if _shape_3d and is_instance_valid(_shape_3d): return
 	_shape_3d = parent.add_shape_3d(shape, _local_position(parent), role, name)
 	_shape_3d.disabled = disabled
@@ -74,11 +74,11 @@ func _exit_tree() -> void:
 
 
 func _sync_shape() -> void:
-	var parent := get_parent() as CollisionObjectDaicon
+	var parent := get_parent() as CollisionObject25D
 	if _shape_3d and parent: _shape_3d.position = _local_position(parent)
 
 
-func _local_position(parent: CollisionObjectDaicon) -> Vector3:
+func _local_position(parent: CollisionObject25D) -> Vector3:
 	return Vector3(position.x / parent.tile_size, 0.0, position.y / parent.tile_size) + offset_3d
 
 
@@ -89,7 +89,7 @@ func _process(_delta: float) -> void:
 func _draw() -> void:
 	if not shape: return
 	if not Engine.is_editor_hint() and not (is_inside_tree() and get_tree().debug_collisions_hint): return
-	var parent := get_parent() as CollisionObjectDaicon
+	var parent := get_parent() as CollisionObject25D
 	var ts: float = float(parent.tile_size) if parent else 16.0
 	var box := _footprint()
 	var base := Rect2(Vector2(box.position.x, box.position.z + offset_3d.z - offset_3d.y - box.position.y) * ts, Vector2(box.size.x, box.size.z) * ts)

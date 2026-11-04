@@ -1,5 +1,5 @@
 @tool
-class_name PhysicsBodyDaicon extends CollisionObjectDaicon
+class_name PhysicsBody25D extends CollisionObject25D
 ## Base of the Daicon bodies, like PhysicsBody2D. `motion` vectors are on the ground plane in px.
 ## The extra last argument `motion_height` is a vertical motion in blocks.
 
@@ -36,18 +36,18 @@ const BODY_CLEARANCE: float = 0.15
 
 ## Moves the body along `motion` (ground px) and `motion_height` (blocks), and stops at the first
 ## collision. Returns the collision, or null.
-func move_and_collide(motion: Vector2, test_only: bool = false, safe_margin: float = 0.08, recovery_as_collision: bool = false, motion_height: float = 0.0) -> KinematicCollisionDaicon:
+func move_and_collide(motion: Vector2, test_only: bool = false, safe_margin: float = 0.08, recovery_as_collision: bool = false, motion_height: float = 0.0) -> KinematicCollision25D:
 	var body := core as PhysicsBody3D
 	if not body: return null
 	if not test_only: _apply_position_write()
 	var hit := body.move_and_collide(_motion_3d(motion, motion_height), test_only, safe_margin / tile_size, recovery_as_collision)
 	if not test_only: _sync_from_core()
-	return KinematicCollisionDaicon.new(hit, tile_size) if hit else null
+	return KinematicCollision25D.new(hit, tile_size) if hit else null
 
 
 ## True if the body would collide when it moves along `motion` from `from`. `from` is a drawn 2D
 ## transform; the body keeps its current height. `collision` gets the result, if not null.
-func test_move(from: Transform2D, motion: Vector2, collision: KinematicCollisionDaicon = null, safe_margin: float = 0.08, recovery_as_collision: bool = false, max_collisions: int = 1, motion_height: float = 0.0) -> bool:
+func test_move(from: Transform2D, motion: Vector2, collision: KinematicCollision25D = null, safe_margin: float = 0.08, recovery_as_collision: bool = false, max_collisions: int = 1, motion_height: float = 0.0) -> bool:
 	var body := core as PhysicsBody3D
 	if not body: return false
 	var h: float = height
@@ -70,7 +70,7 @@ func remove_collision_exception_with(body: Node) -> void:
 
 ## The bodies that this body ignores. Daicon cores are mapped to their Daicon nodes.
 func get_collision_exceptions() -> Array:
-	return (core as PhysicsBody3D).get_collision_exceptions().map(func(b: Node) -> Object: return CollisionObjectDaicon.from_3d(b))
+	return (core as PhysicsBody3D).get_collision_exceptions().map(func(b: Node) -> Object: return CollisionObject25D.from_3d(b))
 
 
 ## The gravity at the body, in blocks per second squared (Vector3: 3D Y is up).
@@ -83,7 +83,7 @@ func _motion_3d(motion: Vector2, motion_height: float) -> Vector3:
 
 
 func _core_of(node: Node) -> Node:
-	return (node as CollisionObjectDaicon).core if node is CollisionObjectDaicon else node
+	return (node as CollisionObject25D).core if node is CollisionObject25D else node
 
 
 func _init_core() -> void:

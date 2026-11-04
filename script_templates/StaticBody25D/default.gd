@@ -1,5 +1,5 @@
 @tool
-extends StaticBodyDaicon
+extends StaticBody25D
 
 func _ready() -> void:
 	super._ready()

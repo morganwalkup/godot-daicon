@@ -1,6 +1,6 @@
 @tool
 @icon("res://addons/daicon/icons/daicon.svg")
-class_name CollisionObjectDaicon extends Node2D
+class_name CollisionObject25D extends Node2D
 ## Base of every Daicon body and area. The API is like CollisionObject2D, but a hidden 3D node
 ## (`core`) does the physics. 1 block = 1 tile = `tile_size` px.
 ##
@@ -11,7 +11,7 @@ class_name CollisionObjectDaicon extends Node2D
 ## - `collision_layer` / `collision_mask`: 3D layer bits.
 ##
 ## Not mirrored: input_pickable, input_event, mouse_entered/exited, mouse_shape_*, get_rid()
-## (use get_rid_3d()), the shape-owner API (use CollisionShapeDaicon children).
+## (use get_rid_3d()), the shape-owner API (use CollisionShape25D children).
 ## 2D rotation and scale do not rotate or scale the 3D shapes.
 
 ## Bodies whose heights differ by this much or more are not on the same level (see same_level()).
@@ -71,7 +71,7 @@ var _last_synced: Vector2 = Vector2(INF, INF)
 	set(value):
 		collision_priority = value
 		if core: core.collision_priority = value
-## 3D layer of the occluder body that CollisionShapeDaicon nodes with role OCCLUDER build.
+## 3D layer of the occluder body that CollisionShape25D nodes with role OCCLUDER build.
 @export_flags_3d_physics var occluder_layer: int = 1 << 1
 @export var disable_mode: CollisionObject3D.DisableMode = CollisionObject3D.DISABLE_MODE_REMOVE:
 	set(value):
@@ -85,7 +85,7 @@ func _ready() -> void:
 	z_index = 1
 	_init_core()
 	for child: Node in get_children():
-		if child is CollisionShapeDaicon and not is_placeholder(child): (child as CollisionShapeDaicon).attach()
+		if child is CollisionShape25D and not is_placeholder(child): (child as CollisionShape25D).attach()
 	core.set_meta("z_index", z_index)
 	if not Engine.is_editor_hint():
 		_last_synced = _get_position_2d()
@@ -217,7 +217,7 @@ static func same_level(a: Node, b: Node) -> bool:
 	return absf(height_of(a) - height_of(b)) < SAME_LEVEL_TOLERANCE
 
 
-## The areas that overlap `area` and are near its height. It accepts an Area2D or an AreaDaicon.
+## The areas that overlap `area` and are near its height. It accepts an Area2D or an Area25D.
 static func same_level_areas(area: Node) -> Array:
 	var result: Array = []
 	for other: Node in area.call("get_overlapping_areas"):
@@ -230,16 +230,16 @@ static func height_of(node: Node) -> float:
 	var curr: Node = node
 	while curr:
 		# The property, not get_height(): a placeholder (see is_placeholder()) has only properties.
-		if curr is CollisionObjectDaicon: return (curr as CollisionObjectDaicon).height
+		if curr is CollisionObject25D: return (curr as CollisionObject25D).height
 		curr = curr.get_parent()
 	return 0.0
 
 
 ## Walks up the parent chain and returns the first Daicon ancestor, or null.
-static func find_parent_entity(node: Node) -> CollisionObjectDaicon:
+static func find_parent_entity(node: Node) -> CollisionObject25D:
 	var curr: Node = node.get_parent()
 	while curr:
-		if curr is CollisionObjectDaicon: return curr as CollisionObjectDaicon
+		if curr is CollisionObject25D: return curr as CollisionObject25D
 		curr = curr.get_parent()
 	return null
 #endregion
@@ -278,12 +278,12 @@ func z_index_for_height(at_height: float, coef: float = 0.0) -> int:
 
 
 #region Shapes
-## The 3D node that holds the shapes of a CollisionShapeDaicon role. It builds the whisker or the
+## The 3D node that holds the shapes of a CollisionShape25D role. It builds the whisker or the
 ## occluder when the first shape needs it.
 func shape_parent(role: int) -> CollisionObject3D:
 	if not core: return null
 	match role:
-		CollisionShapeDaicon.Role.WHISKER:
+		CollisionShape25D.Role.WHISKER:
 			if not whisker:
 				whisker = Area3D.new()
 				whisker.name = "Whisker"
@@ -293,7 +293,7 @@ func shape_parent(role: int) -> CollisionObject3D:
 				whisker.monitorable = true
 				core.add_child(whisker)
 			return whisker
-		CollisionShapeDaicon.Role.OCCLUDER:
+		CollisionShape25D.Role.OCCLUDER:
 			if not _occluder:
 				_occluder = StaticBody3D.new()
 				_occluder.name = "Occluder"
@@ -307,7 +307,7 @@ func shape_parent(role: int) -> CollisionObject3D:
 
 
 ## Adds a CollisionShape3D to the node of a role, with a local position in blocks from the feet.
-func add_shape_3d(shape: Shape3D, local_position: Vector3, role: int = CollisionShapeDaicon.Role.COLLISION, shape_name: String = "") -> CollisionShape3D:
+func add_shape_3d(shape: Shape3D, local_position: Vector3, role: int = CollisionShape25D.Role.COLLISION, shape_name: String = "") -> CollisionShape3D:
 	var parent := shape_parent(role)
 	if not parent: return null
 	var node := CollisionShape3D.new()
@@ -318,10 +318,10 @@ func add_shape_3d(shape: Shape3D, local_position: Vector3, role: int = Collision
 	return node
 
 
-## True if the node has a CollisionShapeDaicon child of a role.
-func has_shape_child(role: int = CollisionShapeDaicon.Role.COLLISION) -> bool:
+## True if the node has a CollisionShape25D child of a role.
+func has_shape_child(role: int = CollisionShape25D.Role.COLLISION) -> bool:
 	for child: Node in get_children():
-		if child is CollisionShapeDaicon and (child as CollisionShapeDaicon).role == role: return true
+		if child is CollisionShape25D and (child as CollisionShape25D).role == role: return true
 	return false
 #endregion
 

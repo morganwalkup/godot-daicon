@@ -1,9 +1,9 @@
 @tool
 @icon("res://addons/daicon/icons/static_daicon.svg")
-class_name StaticBodyDaicon extends PhysicsBodyDaicon
+class_name StaticBody25D extends PhysicsBody25D
 ## A still body, like StaticBody2D. The core is a StaticBody3D.
 ##
-## With no CollisionShapeDaicon child, the node builds a box from footprint_size and wall_height.
+## With no CollisionShape25D child, the node builds a box from footprint_size and wall_height.
 ## With occluder_height above zero and no OCCLUDER shape child, it builds an occluder box.
 ## The node syncs the 2D position only on change (teleport, a position write, or a parent move).
 ##
@@ -18,7 +18,7 @@ class_name StaticBodyDaicon extends PhysicsBodyDaicon
 @export_custom(PROPERTY_HINT_NONE, "suffix:blocks") var occluder_height: float = 0.0
 ## Size of the occluder footprint, in px. Zero means footprint_size.
 @export_custom(PROPERTY_HINT_NONE, "suffix:px") var occluder_size: Vector2 = Vector2.ZERO
-## On for a body that can go away at runtime, for example a barrel. NavigationRegionDaicon does
+## On for a body that can go away at runtime, for example a barrel. NavigationRegion25D does
 ## not bake it. It gets a NavigationObstacle3D, so agents with avoidance steer around it.
 @export var navigation_obstacle: bool = false
 
@@ -49,11 +49,11 @@ func _ready() -> void:
 	super._ready()
 	if Engine.is_editor_hint():
 		return
-	if _has_footprint() and not has_shape_child(CollisionShapeDaicon.Role.COLLISION):
+	if _has_footprint() and not has_shape_child(CollisionShape25D.Role.COLLISION):
 		add_shape_3d(_box(footprint_size, wall_height), Vector3(0.0, wall_height / 2.0, 0.0))
-	if occluder_height > 0.0 and not has_shape_child(CollisionShapeDaicon.Role.OCCLUDER):
+	if occluder_height > 0.0 and not has_shape_child(CollisionShape25D.Role.OCCLUDER):
 		var size: Vector2 = occluder_size if occluder_size != Vector2.ZERO else footprint_size
-		add_shape_3d(_box(size, occluder_height), Vector3(0.0, occluder_height / 2.0, 0.0), CollisionShapeDaicon.Role.OCCLUDER)
+		add_shape_3d(_box(size, occluder_height), Vector3(0.0, occluder_height / 2.0, 0.0), CollisionShape25D.Role.OCCLUDER)
 	if navigation_obstacle and _has_footprint():
 		_obstacle = NavigationObstacle3D.new()
 		_obstacle.name = "NavigationObstacle3D"
@@ -70,7 +70,7 @@ func set_obstacle_enabled(enabled: bool) -> void:
 		_obstacle.avoidance_enabled = enabled
 
 
-## The solid box that NavigationRegionDaicon bakes, in 3D global blocks. Empty for a navigation
+## The solid box that NavigationRegion25D bakes, in 3D global blocks. Empty for a navigation
 ## obstacle or a body with no footprint. It reads the 2D position, so it also works in the editor.
 func get_navigation_footprint() -> AABB:
 	return navigation_footprint_of(self)
@@ -79,7 +79,7 @@ func get_navigation_footprint() -> AABB:
 ## get_navigation_footprint() of a body. It reads only exported properties and the native position,
 ## so it also works on a placeholder in the editor (see is_placeholder()), for example a subclass
 ## without @tool.
-static func navigation_footprint_of(body: StaticBodyDaicon) -> AABB:
+static func navigation_footprint_of(body: StaticBody25D) -> AABB:
 	var size_px: Vector2 = body.footprint_size
 	if body.navigation_obstacle or size_px.x <= 0.0 or size_px.y <= 0.0:
 		return AABB()

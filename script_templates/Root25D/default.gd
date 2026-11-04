@@ -1,4 +1,4 @@
-extends Daicon
+extends Root25D
 
 ## Toward the camera: a point at (x, y + 1, z + 1) draws at the same 2D position as (x, y, z).
 const VIEW_RAY := Vector3(0, 5, 5)
@@ -19,7 +19,7 @@ func _physics_process(_delta: float) -> void:
 			continue
 		position_array.clear()
 		for shader_trigger: Node in shader_trigger_nodes:
-			var trigger := shader_trigger as CollisionObjectDaicon
+			var trigger := shader_trigger as CollisionObject25D
 			if not is_instance_valid(trigger):
 				continue
 			if target.z_index >= trigger.z_index and _is_hidden(trigger):
@@ -28,7 +28,7 @@ func _physics_process(_delta: float) -> void:
 		mat.set_shader_parameter("NumCircleCentres", position_array.size())
 
 
-func _is_hidden(trigger: CollisionObjectDaicon) -> bool:
+func _is_hidden(trigger: CollisionObject25D) -> bool:
 	if not trigger.core or not trigger.core.is_inside_tree():
 		return false
 	var from := trigger.get_ground_position_3d() + Vector3(0, RAY_START_HEIGHT, 0)

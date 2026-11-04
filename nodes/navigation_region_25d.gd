@@ -1,23 +1,23 @@
 @tool
 @icon("res://addons/daicon/icons/daicon_map_layer.svg")
-class_name NavigationRegionDaicon
+class_name NavigationRegion25D
 extends NavigationRegion3D
 ## The 3D navmesh of one map (one streamed region), for NavigationAgent3D on Daicon body cores.
 ## Put it as a direct child of the map's 2D root. Press "Bake navmesh" in the inspector.
-## The bake reads the 3D blocks, ramps, and walls of every TileMapLayerDaicon under the parent,
-## get_navigation_footprint() of every StaticBodyDaicon, and a ground floor at height 0. It saves
+## The bake reads the 3D blocks, ramps, and walls of every TileMapLayer25D under the parent,
+## get_navigation_footprint() of every StaticBody25D, and a ground floor at height 0. It saves
 ## the NavigationMesh next to the scene. The game never bakes: it only loads the saved file.
 ## The whole native NavigationRegion3D API stays the same.
 
 ## The string values stay the same as in the old Kinsprit NavRegion25D, so saved fingerprints stay valid.
 const SOURCE_GROUP := &"nav_region_25d_source"
 const FINGERPRINT_META := &"source_fingerprint"
-const DEFAULT_NAME := "NavigationRegionDaicon"
+const DEFAULT_NAME := "NavigationRegion25D"
 const POLL_SECONDS: float = 2.0
 
 @export_tool_button("Bake navmesh", "Bake") var bake_button: Callable = bake
 ## Bake area in tiles, in the parent's space (x = X, y = Z on the ground). Zero size means the
-## union of the TileMapLayerDaicon cells. Set it when two regions must meet at an exact edge.
+## union of the TileMapLayer25D cells. Set it when two regions must meet at an exact edge.
 @export var bounds: Rect2 = Rect2()
 ## Adds a walkable floor at height 0 over the bake area (a WorldBoundaryShape3D ground cannot be
 ## read by the baker).
@@ -73,7 +73,7 @@ func _process(delta: float) -> void:
 
 func _get_configuration_warnings() -> PackedStringArray:
 	if not get_parent() is Node2D:
-		return PackedStringArray(["NavigationRegionDaicon must be a child of the map's 2D root."])
+		return PackedStringArray(["NavigationRegion25D must be a child of the map's 2D root."])
 	var placeholders := _placeholder_layers()
 	if not placeholders.is_empty():
 		return PackedStringArray(["%s has a script without @tool, so it builds no 3D geometry in the editor. Add @tool to the script, or the bake and the stale check cannot read the layer." % placeholders[0].name])
@@ -88,7 +88,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 func bake() -> void:
 	var placeholders := _placeholder_layers()
 	if not placeholders.is_empty():
-		push_error("NavigationRegionDaicon: not baked. %s has a script without @tool, so the editor cannot read its 3D geometry." % placeholders[0].get_path())
+		push_error("NavigationRegion25D: not baked. %s has a script without @tool, so the editor cannot read its 3D geometry." % placeholders[0].get_path())
 		return
 	var start := Time.get_ticks_usec()
 	var path := navmesh_path()
@@ -100,7 +100,7 @@ func bake() -> void:
 	navigation_mesh = nm
 	_stale = false
 	update_configuration_warnings()
-	print("NavigationRegionDaicon: baked %s in %.0f ms (%d polygons), save error %d" % [path, (Time.get_ticks_usec() - start) / 1000.0, nm.get_polygon_count(), err])
+	print("NavigationRegion25D: baked %s in %.0f ms (%d polygons), save error %d" % [path, (Time.get_ticks_usec() - start) / 1000.0, nm.get_polygon_count(), err])
 	if Engine.is_editor_hint() and Engine.has_singleton("EditorInterface"):
 		var editor: Object = Engine.get_singleton("EditorInterface")
 		editor.call("mark_scene_as_unsaved")
@@ -125,7 +125,7 @@ func is_stale() -> bool:
 
 
 ## res://<scene path without extension>_nav.tres, or _<name>_nav.tres for a region not named
-## NavigationRegionDaicon.
+## NavigationRegion25D.
 func navmesh_path() -> String:
 	var scene_root: Node = owner if owner else self
 	var base := scene_root.scene_file_path.get_basename()
@@ -142,7 +142,7 @@ func collect_source_geometry(nm: NavigationMesh) -> NavigationMeshSourceGeometry
 	if not parent:
 		return data
 	var sources: Array[Node] = []
-	for layer: TileMapLayerDaicon in _map_layers():
+	for layer: TileMapLayer25D in _map_layers():
 		for node: Node in [layer.get_grid_map(), layer.get_extrusion()]:
 			if node:
 				node.add_to_group(SOURCE_GROUP)
@@ -151,8 +151,8 @@ func collect_source_geometry(nm: NavigationMesh) -> NavigationMeshSourceGeometry
 	for node: Node in sources:
 		node.remove_from_group(SOURCE_GROUP)
 	for node: Node in parent.find_children("*", "Node2D", true, false):
-		if node is StaticBodyDaicon:
-			_add_footprint(data, node as StaticBodyDaicon)
+		if node is StaticBody25D:
+			_add_footprint(data, node as StaticBody25D)
 	if bake_ground:
 		var box := nm.filter_baking_aabb.grow(border_size + agent_radius + cell_size)
 		var a := Vector3(box.position.x, 0.0, box.position.z)
@@ -163,18 +163,18 @@ func collect_source_geometry(nm: NavigationMesh) -> NavigationMeshSourceGeometry
 	return data
 
 
-## The bake area in this node's space, from `bounds` or from the TileMapLayerDaicon cells.
+## The bake area in this node's space, from `bounds` or from the TileMapLayer25D cells.
 func bake_aabb() -> AABB:
 	if bounds.has_area():
 		return AABB(Vector3(bounds.position.x, -1.0, bounds.position.y), Vector3(bounds.size.x, 10.0, bounds.size.y))
 	var box := AABB()
 	var first := true
-	for layer: TileMapLayerDaicon in _map_layers():
+	for layer: TileMapLayer25D in _map_layers():
 		var rect := layer.get_used_rect()
 		if not rect.has_area() or not layer.tile_set:
 			continue
 		var level: int = layer.get_level()
-		var origin: Vector3 = to_local(DaiconMapBuilder.origin_3d(layer, layer.tile_set.tile_size, layer.cell_offset))
+		var origin: Vector3 = to_local(TileMapBuilder25D.origin_3d(layer, layer.tile_set.tile_size, layer.cell_offset))
 		var cells := AABB(origin + Vector3(rect.position.x, -1.0, rect.position.y + level), Vector3(rect.size.x, 10.0, rect.size.y))
 		box = cells if first else box.merge(cells)
 		first = false
@@ -182,28 +182,28 @@ func bake_aabb() -> AABB:
 
 
 ## The map layers that the bake reads. A placeholder layer (see _placeholder_layers()) is not one.
-func _map_layers() -> Array[TileMapLayerDaicon]:
+func _map_layers() -> Array[TileMapLayer25D]:
 	return _find_layers(false)
 
 
 ## The map layers with a script without @tool. In the editor they have a placeholder script
-## instance and build no GridMap or extrusion (see CollisionObjectDaicon.is_placeholder()).
-func _placeholder_layers() -> Array[TileMapLayerDaicon]:
+## instance and build no GridMap or extrusion (see CollisionObject25D.is_placeholder()).
+func _placeholder_layers() -> Array[TileMapLayer25D]:
 	return _find_layers(true)
 
 
-func _find_layers(placeholders: bool) -> Array[TileMapLayerDaicon]:
-	var layers: Array[TileMapLayerDaicon] = []
+func _find_layers(placeholders: bool) -> Array[TileMapLayer25D]:
+	var layers: Array[TileMapLayer25D] = []
 	var parent := get_parent()
 	if not parent:
 		return layers
 	for node: Node in parent.find_children("*", "TileMapLayer", true, false):
-		if node is TileMapLayerDaicon and CollisionObjectDaicon.is_placeholder(node) == placeholders:
-			layers.append(node as TileMapLayerDaicon)
+		if node is TileMapLayer25D and CollisionObject25D.is_placeholder(node) == placeholders:
+			layers.append(node as TileMapLayer25D)
 	return layers
 
 
-## Keeps this node under the parent's 2D origin, as TileMapLayerDaicon does with its GridMap.
+## Keeps this node under the parent's 2D origin, as TileMapLayer25D does with its GridMap.
 func _sync_origin() -> void:
 	var parent := get_parent() as Node2D
 	if not parent or not is_inside_tree():
@@ -231,8 +231,8 @@ func _set_parameters(nm: NavigationMesh) -> void:
 ## add_faces() takes global space: the data already holds the inverse of this node's transform.
 ## The static helper, not body.get_navigation_footprint(): in the editor the body can be a
 ## placeholder (a subclass without @tool, for example a barrel), and a placeholder has no methods.
-func _add_footprint(data: NavigationMeshSourceGeometryData3D, body: StaticBodyDaicon) -> void:
-	var footprint := StaticBodyDaicon.navigation_footprint_of(body)
+func _add_footprint(data: NavigationMeshSourceGeometryData3D, body: StaticBody25D) -> void:
+	var footprint := StaticBody25D.navigation_footprint_of(body)
 	if not footprint.has_volume():
 		return
 	var box := BoxMesh.new()

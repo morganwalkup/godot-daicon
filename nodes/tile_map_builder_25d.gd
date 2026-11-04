@@ -1,6 +1,6 @@
 @tool
-class_name DaiconMapBuilder extends RefCounted
-## The 3D build logic of TileMapLayerDaicon.
+class_name TileMapBuilder25D extends RefCounted
+## The 3D build logic of TileMapLayer25D.
 ##
 ## Height levels: a layer on level L puts its blocks at Y [L-1, L) and its
 ## extruded walls at Y [L, L + wall_height). A tile drawn at row R on level L

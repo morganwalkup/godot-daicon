@@ -1,6 +1,6 @@
 @tool
 @icon("res://addons/daicon/icons/kinematic_daicon.svg")
-class_name CharacterBodyDaicon extends PhysicsBodyDaicon
+class_name CharacterBody25D extends PhysicsBody25D
 ## A character body, like CharacterBody2D. A hidden CharacterBody3D (`core`) does the collision.
 ## Set `velocity` (px/s on the ground plane: x = east, y = south) and call move_and_slide().
 ## `velocity` is not the drawn screen velocity: on a ramp that goes north or south, the drawn
@@ -11,7 +11,7 @@ class_name CharacterBodyDaicon extends PhysicsBodyDaicon
 ##
 ## Not mirrored: up_direction (up is always 3D Y; see up_direction_3d). get_floor_normal(),
 ## get_wall_normal(), and the velocity getters return the ground-plane part; the *_3d variants
-## return the full Vector3. get_slide_collision() returns a KinematicCollisionDaicon.
+## return the full Vector3. get_slide_collision() returns a KinematicCollision25D.
 
 ## After a teleport above the ground with use_gravity on, gravity waits this many physics frames
 ## at most for a floor to appear under the feet. A region that is still loading has no floor yet.
@@ -102,7 +102,7 @@ var _requested_velocity: Vector2 = Vector2.ZERO
 @export_custom(PROPERTY_HINT_NONE, "suffix:blocks/s") var max_fall_speed: float = 15.0
 
 @export_group("Shape")
-## Radius of the capsule that the body builds when it has no CollisionShapeDaicon child, in px.
+## Radius of the capsule that the body builds when it has no CollisionShape25D child, in px.
 @export_custom(PROPERTY_HINT_NONE, "suffix:px") var footprint_radius: float = 6.0
 ## Height of the body, in blocks. The capsule is BODY_CLEARANCE shorter.
 @export_custom(PROPERTY_HINT_NONE, "suffix:blocks") var body_height: float = 1.0
@@ -114,8 +114,8 @@ func _ready() -> void:
 	super._ready()
 	if Engine.is_editor_hint():
 		return
-	if not has_shape_child(CollisionShapeDaicon.Role.COLLISION): _add_body_shape()
-	if not has_shape_child(CollisionShapeDaicon.Role.WHISKER) and whisker_reach > 0.0: _add_whisker()
+	if not has_shape_child(CollisionShape25D.Role.COLLISION): _add_body_shape()
+	if not has_shape_child(CollisionShape25D.Role.WHISKER) and whisker_reach > 0.0: _add_whisker()
 	_attach_navigation_agent()
 	if use_gravity:
 		# Run after the scripts that call move_and_slide(), so a frame with no call still falls.
@@ -242,14 +242,14 @@ func get_slide_collision_count() -> int:
 	return _body().get_slide_collision_count()
 
 
-func get_slide_collision(slide_idx: int) -> KinematicCollisionDaicon:
+func get_slide_collision(slide_idx: int) -> KinematicCollision25D:
 	var hit := _body().get_slide_collision(slide_idx)
-	return KinematicCollisionDaicon.new(hit, tile_size) if hit else null
+	return KinematicCollision25D.new(hit, tile_size) if hit else null
 
 
-func get_last_slide_collision() -> KinematicCollisionDaicon:
+func get_last_slide_collision() -> KinematicCollision25D:
 	var hit := _body().get_last_slide_collision()
-	return KinematicCollisionDaicon.new(hit, tile_size) if hit else null
+	return KinematicCollision25D.new(hit, tile_size) if hit else null
 #endregion
 
 
@@ -274,7 +274,7 @@ func push(motion: Vector2) -> Vector2:
 	return _ground(body.global_position - start.origin) * tile_size
 
 
-## Pushes the CharacterBodyDaicon bodies that the last move_and_slide() ran into, with push().
+## Pushes the CharacterBody25D bodies that the last move_and_slide() ran into, with push().
 ## A body is pushed only if it is on `layer_mask`, it is at the same level (see same_level()), and
 ## the requested velocity of this body points into it. The push is along the contact normal, at
 ## `push_speed` px/s or at the requested speed into the body if that is lower.
@@ -285,7 +285,7 @@ func push_slide_colliders(push_speed: float, layer_mask: int) -> void:
 	var pushed: Array[Object] = []
 	for i: int in get_slide_collision_count():
 		var hit := get_slide_collision(i)
-		var other := hit.get_collider() as CharacterBodyDaicon
+		var other := hit.get_collider() as CharacterBody25D
 		if other == null or other == self or pushed.has(other) or other.collision_layer & layer_mask == 0 or not same_level(self, other):
 			continue
 		var direction: Vector2 = -hit.get_normal()
@@ -351,7 +351,7 @@ func _add_body_shape() -> void:
 	var capsule := CapsuleShape3D.new()
 	capsule.radius = footprint_radius / tile_size
 	capsule.height = maxf(body_height - BODY_CLEARANCE, capsule.radius * 2.0)
-	add_shape_3d(capsule, Vector3(0.0, capsule.height / 2.0, 0.0), CollisionShapeDaicon.Role.COLLISION, "BodyShape")
+	add_shape_3d(capsule, Vector3(0.0, capsule.height / 2.0, 0.0), CollisionShape25D.Role.COLLISION, "BodyShape")
 
 
 ## The whisker is the body's box swept toward the camera (up and south).
@@ -368,7 +368,7 @@ func _add_whisker() -> void:
 				points.append(corner + sweep)
 	var hull := ConvexPolygonShape3D.new()
 	hull.points = points
-	add_shape_3d(hull, Vector3.ZERO, CollisionShapeDaicon.Role.WHISKER)
+	add_shape_3d(hull, Vector3.ZERO, CollisionShape25D.Role.WHISKER)
 
 
 ## A NavigationAgent3D uses its parent's position, so the agent goes on a node at the feet.

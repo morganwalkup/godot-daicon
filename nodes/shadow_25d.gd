@@ -1,6 +1,6 @@
 @tool
 @icon("res://addons/daicon/icons/daicon_shadow.svg")
-class_name DaiconShadow extends Sprite2D
+class_name Shadow25D extends Sprite2D
 
 #region Properties
 @export_range(0.05, 2.0, 0.05, "suffix:m") var footprint_radius: float = 0.35:
@@ -43,7 +43,7 @@ class_name DaiconShadow extends Sprite2D
 #region Variables
 const SHAPE_NAME = "ShadowShapeCast"
 
-var parent_entity: CollisionObjectDaicon
+var parent_entity: CollisionObject25D
 var shape_cast: ShapeCast3D
 var _debug_layer: Node2D
 #endregion
@@ -61,7 +61,7 @@ func _notification(what: int) -> void:
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
-	if not CollisionObjectDaicon.find_parent_entity(self):  warnings.append("DaiconShadow must be a child node of a Daicon body or area.")
+	if not CollisionObject25D.find_parent_entity(self):  warnings.append("Shadow25D must be a child node of a Daicon body or area.")
 	return warnings
 
 func _process(_delta: float) -> void:
@@ -83,9 +83,9 @@ func _process(_delta: float) -> void:
 
 #region Core Setup
 func _find_entity() -> void:
-	var entity := CollisionObjectDaicon.find_parent_entity(self)
-	# A placeholder entity has no core in the editor (see CollisionObjectDaicon.is_placeholder()).
-	parent_entity = null if CollisionObjectDaicon.is_placeholder(entity) else entity
+	var entity := CollisionObject25D.find_parent_entity(self)
+	# A placeholder entity has no core in the editor (see CollisionObject25D.is_placeholder()).
+	parent_entity = null if CollisionObject25D.is_placeholder(entity) else entity
 
 func _inject_shapecast() -> void:
 	if not parent_entity or not parent_entity.core: return

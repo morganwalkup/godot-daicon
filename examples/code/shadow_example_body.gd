@@ -1,5 +1,5 @@
 @tool
-extends CharacterBodyDaicon
+extends CharacterBody25D
 ## A body for the shadow example. The arrow keys move it on the ground plane; ui_accept jumps.
 
 const SPEED: float = 80.0 # px/s on the ground plane

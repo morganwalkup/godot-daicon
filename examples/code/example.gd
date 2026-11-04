@@ -1,5 +1,5 @@
 @tool
-extends Daicon
+extends Root25D
 ## Cuts a circle in the map layers over each trigger that stands behind a block, so the trigger
 ## stays visible. A trigger is hidden when a ray from it toward the camera hits a block.
 
@@ -24,7 +24,7 @@ func _physics_process(_delta: float) -> void:
 			continue
 		position_array.clear()
 		for shader_trigger: Node in shader_trigger_nodes:
-			var trigger := shader_trigger as CollisionObjectDaicon
+			var trigger := shader_trigger as CollisionObject25D
 			if not is_instance_valid(trigger):
 				continue
 			# The target is on or above the trigger's level, and a block hides the trigger.
@@ -35,7 +35,7 @@ func _physics_process(_delta: float) -> void:
 		mat.set_shader_parameter("NumCircleCentres", position_array.size())
 
 
-func _is_hidden(trigger: CollisionObjectDaicon) -> bool:
+func _is_hidden(trigger: CollisionObject25D) -> bool:
 	if not trigger.core or not trigger.core.is_inside_tree():
 		return false
 	var from := trigger.get_ground_position_3d() + Vector3(0, RAY_START_HEIGHT, 0)

@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://d1sgg3bial5f7"]
 
-[ext_resource type="Script" uid="uid://r7imlxxd3hbv" path="res://addons/daicon/nodes/collision_shape_daicon.gd" id="cs_daicon"]
+[ext_resource type="Script" uid="uid://r7imlxxd3hbv" path="res://addons/daicon/nodes/collision_shape_25d.gd" id="cs_daicon"]
 [ext_resource type="Script" uid="uid://djuketxct7ltf" path="res://addons/daicon/examples/code/player.gd" id="1_rxg4x"]
 [ext_resource type="Texture2D" uid="uid://1dtkll3jibsk" path="res://addons/daicon/examples/assets/basic.png" id="2_rxg4x"]
-[ext_resource type="Script" uid="uid://c4jpvau84mi7k" path="res://addons/daicon/nodes/daicon_shadow.gd" id="3_7dqni"]
+[ext_resource type="Script" uid="uid://c4jpvau84mi7k" path="res://addons/daicon/nodes/shadow_25d.gd" id="3_7dqni"]
 [ext_resource type="Texture2D" uid="uid://rvj40e0hpbx3" path="res://addons/daicon/examples/assets/shadow.png" id="3_43feq"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_h24nl"]
@@ -752,12 +752,12 @@ y_sort_enabled = true
 script = ExtResource("1_rxg4x")
 metadata/_custom_type_script = "uid://7h31iy1d6nmc"
 
-[node name="CollisionShapeDaicon" type="Node2D" parent="."]
+[node name="CollisionShape25D" type="Node2D" parent="."]
 script = ExtResource("cs_daicon")
 shape = SubResource("BoxShape3D_h24nl")
 offset_3d = Vector3(0, 0.5, 0)
 
-[node name="DaiconShadow" type="Sprite2D" parent="."]
+[node name="Shadow25D" type="Sprite2D" parent="."]
 show_behind_parent = true
 z_as_relative = false
 y_sort_enabled = true

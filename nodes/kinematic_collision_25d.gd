@@ -1,4 +1,4 @@
-class_name KinematicCollisionDaicon extends RefCounted
+class_name KinematicCollision25D extends RefCounted
 ## One collision of a Daicon body, like KinematicCollision2D. It wraps a KinematicCollision3D.
 ## Vectors are on the ground plane in px (x = east, y = south), unless the name ends in _3d.
 ## get_position() is the drawn 2D position of the contact point.
@@ -13,9 +13,9 @@ func _init(collision: KinematicCollision3D = KinematicCollision3D.new(), tile_si
 
 
 ## The Daicon node that owns the collider, or the collider itself (for example a GridMap is mapped
-## to its TileMapLayerDaicon).
+## to its TileMapLayer25D).
 func get_collider(collision_index: int = 0) -> Object:
-	return CollisionObjectDaicon.from_3d(_collision.get_collider(collision_index))
+	return CollisionObject25D.from_3d(_collision.get_collider(collision_index))
 
 
 func get_collider_3d(collision_index: int = 0) -> Object:

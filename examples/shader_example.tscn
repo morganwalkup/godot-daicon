@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://c12yxbiou142g" path="res://addons/daicon/examples/code/example.gd" id="1_jtpl2"]
 [ext_resource type="Texture2D" uid="uid://c6u4mv2ecvtel" path="res://addons/daicon/examples/assets/tileset.png" id="2_ku1xe"]
 [ext_resource type="Shader" uid="uid://dg8to3rkhyxqo" path="res://addons/daicon/shaders/blur_circle.gdshader" id="2_m256f"]
-[ext_resource type="Script" uid="uid://th1q6bteyw03" path="res://addons/daicon/nodes/tile_map_layer_daicon.gd" id="3_m256f"]
+[ext_resource type="Script" uid="uid://th1q6bteyw03" path="res://addons/daicon/nodes/tile_map_layer_25d.gd" id="3_m256f"]
 [ext_resource type="MeshLibrary" uid="uid://rm1kdg06ylaf" path="res://addons/daicon/examples/mesh/tiles_mesh.tres" id="4_tqpdw"]
 [ext_resource type="Shader" uid="uid://cykmh24d835l3" path="res://addons/daicon/shaders/circle.gdshader" id="6_tqpdw"]
 [ext_resource type="PackedScene" uid="uid://bo8sog8wpw4n4" path="res://addons/daicon/examples/static_body_daicon.tscn" id="7_jtpl2"]
@@ -131,10 +131,10 @@ shader_parameter/NumCircleCentres = 0
 shader_parameter/CircleRadius = 75.0
 shader_parameter/CircleBlur = 0.01
 
-[node name="Daicon" type="Node2D" node_paths=PackedStringArray("shader_trigger_nodes", "shader_target_nodes")]
+[node name="Root25D" type="Node2D" node_paths=PackedStringArray("shader_trigger_nodes", "shader_target_nodes")]
 y_sort_enabled = true
 script = ExtResource("1_jtpl2")
-shader_trigger_nodes = [NodePath("Player"), NodePath("StaticBodyDaicon_1"), NodePath("StaticBodyDaicon_2")]
+shader_trigger_nodes = [NodePath("Player"), NodePath("StaticBody25D_1"), NodePath("StaticBody25D_2")]
 shader_target_nodes = [NodePath("Blur/-1"), NodePath("Circle/-1"), NodePath("Blur/0"), NodePath("Circle/0"), NodePath("Blur/1"), NodePath("Circle/1"), NodePath("Blur/2"), NodePath("Circle/2")]
 
 [node name="Blur" type="Node2D" parent="."]
@@ -212,10 +212,10 @@ tile_set = SubResource("TileSet_cafgl")
 script = ExtResource("3_m256f")
 mesh_library = ExtResource("4_tqpdw")
 
-[node name="StaticBodyDaicon_2" parent="." instance=ExtResource("7_jtpl2")]
+[node name="StaticBody25D_2" parent="." instance=ExtResource("7_jtpl2")]
 position = Vector2(56, -32)
 
-[node name="StaticBodyDaicon_1" parent="." instance=ExtResource("7_jtpl2")]
+[node name="StaticBody25D_1" parent="." instance=ExtResource("7_jtpl2")]
 position = Vector2(-56, -32)
 
 [node name="Player" parent="." instance=ExtResource("8_lbvrf")]

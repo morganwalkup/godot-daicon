@@ -1,6 +1,6 @@
 @tool
 @icon("res://addons/daicon/icons/animated_daicon.svg")
-class_name AnimatableBodyDaicon extends StaticBodyDaicon
+class_name AnimatableBody25D extends StaticBody25D
 ## A body that code or an AnimationPlayer moves, like AnimatableBody2D. The core is an AnimatableBody3D.
 ## Move it with `position` (a Tween or a track) and lift it with `height`. A position write moves
 ## the core; with sync_to_physics, the core moves in the physics step and carries the bodies on it.

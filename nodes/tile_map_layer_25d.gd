@@ -1,13 +1,13 @@
 @tool
 @icon("res://addons/daicon/icons/daicon_map_layer.svg")
-class_name TileMapLayerDaicon extends TileMapLayer
+class_name TileMapLayer25D extends TileMapLayer
 ## A TileMapLayer that also builds 3D collision: GridMap blocks from the "Item" custom data, and
 ## (with extrude_physics) 3D walls from the 2D physics polygons. The whole native TileMapLayer API
 ## stays the same. The height level is z_index / z_step, unless level_from_z_index is off.
 ## Then it is "level", and z_index only sets the draw order.
 ##
 ## A collision with the GridMap or the extrusion maps to this node through
-## CollisionObjectDaicon.from_3d(), so gameplay code can test `collider is TileMapLayerDaicon`.
+## CollisionObject25D.from_3d(), so gameplay code can test `collider is TileMapLayer25D`.
 ## collision_layer and collision_mask are 3D layers (the GridMap names). The 2D tile physics is
 ## off at runtime while disable_2d_collision is on.
 ##
@@ -20,7 +20,7 @@ var extrusion : StaticBody3D
 var _dirty := true
 var _built_level := 0
 
-#region TileMapLayerDaicon Exports
+#region TileMapLayer25D Exports
 
 @export var mesh_library : MeshLibrary:
 	set(library):
@@ -156,7 +156,7 @@ func _ready() -> void:
 	if not tile_set:
 		self.set_y_sort_enabled(true)
 		self.tile_set = TileSet.new()
-		DaiconMapBuilder.add_item_layer(tile_set)
+		TileMapBuilder25D.add_item_layer(tile_set)
 	if disable_2d_collision and not Engine.is_editor_hint(): collision_enabled = false
 	#Expand GridMap
 	grid_map = GridMap.new()
@@ -169,7 +169,7 @@ func _ready() -> void:
 	grid_map.cell_size = size
 	grid_map.collision_layer = collision_layer
 	grid_map.collision_mask = collision_mask
-	grid_map.set_meta(CollisionObjectDaicon.OWNER_META, self)
+	grid_map.set_meta(CollisionObject25D.OWNER_META, self)
 	grid_map.bake_navigation = bake_navigation
 	grid_map.visible = visible_3d
 	
@@ -177,10 +177,10 @@ func _ready() -> void:
 	grid_map.scale = scale_3d
 	
 	extrusion = StaticBody3D.new()
-	extrusion.set_name(DaiconMapBuilder.EXTRUSION_NAME)
+	extrusion.set_name(TileMapBuilder25D.EXTRUSION_NAME)
 	extrusion.collision_layer = extrusion_layer if extrusion_layer != 0 else collision_layer
 	extrusion.collision_mask = collision_mask
-	extrusion.set_meta(CollisionObjectDaicon.OWNER_META, self)
+	extrusion.set_meta(CollisionObject25D.OWNER_META, self)
 	extrusion.physics_material_override = physics_material
 	add_child(extrusion)
 	move_child(extrusion, 1)
@@ -194,12 +194,12 @@ func _process(_delta: float) -> void:
 	if _built_level != get_level(): _dirty = true
 	if _dirty: update_grid_map()
 
-## The GridMap of the blocks, for NavigationRegionDaicon and checks.
+## The GridMap of the blocks, for NavigationRegion25D and checks.
 func get_grid_map() -> GridMap:
 	return grid_map
 
 
-## The StaticBody3D of the extruded walls, for NavigationRegionDaicon and checks.
+## The StaticBody3D of the extruded walls, for NavigationRegion25D and checks.
 func get_extrusion() -> StaticBody3D:
 	return extrusion
 
@@ -219,7 +219,7 @@ func _update_cells(_coords: Array[Vector2i], _forced_cleanup: bool) -> void:
 
 func _sync_origin() -> void:
 	if not tile_set: return
-	var origin := DaiconMapBuilder.origin_3d(self, tile_set.tile_size, cell_offset)
+	var origin := TileMapBuilder25D.origin_3d(self, tile_set.tile_size, cell_offset)
 	if grid_map: grid_map.position = origin
 	if extrusion: extrusion.position = origin
 
@@ -227,7 +227,7 @@ func update_grid_map() -> void:
 	_dirty = false
 	if not grid_map: return
 	grid_map.clear()
-	if extrusion: DaiconMapBuilder.clear_extrusion(extrusion)
+	if extrusion: TileMapBuilder25D.clear_extrusion(extrusion)
 	_built_level = get_level()
-	DaiconMapBuilder.fill_grid_map(grid_map, self, _built_level, mesh_library)
-	if extrude_physics and extrusion: DaiconMapBuilder.fill_extrusion(extrusion, self, _built_level, wall_height)
+	TileMapBuilder25D.fill_grid_map(grid_map, self, _built_level, mesh_library)
+	if extrude_physics and extrusion: TileMapBuilder25D.fill_extrusion(extrusion, self, _built_level, wall_height)

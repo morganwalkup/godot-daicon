@@ -1,11 +1,11 @@
 @tool
 @icon("res://addons/daicon/icons/daicon.svg")
-class_name AreaDaicon extends CollisionObjectDaicon
+class_name Area25D extends CollisionObject25D
 ## An area like Area2D. The core is an Area3D, so the overlap respects height: an area at another
 ## height does not overlap, and no same_level() filter is needed.
-## It detects Daicon bodies and other AreaDaicon nodes. It does not detect Area2D or 2D bodies.
+## It detects Daicon bodies and other Area25D nodes. It does not detect Area2D or 2D bodies.
 ##
-## With no CollisionShapeDaicon child, the node builds a box from footprint_size and area_height.
+## With no CollisionShape25D child, the node builds a box from footprint_size and area_height.
 ## Inside a Daicon body, the stored `height` is the height above that body, and the area keeps it
 ## when the body moves. get_height() returns the height above the ground, as on every Daicon node.
 ##
@@ -85,7 +85,7 @@ signal area_shape_exited(area_rid: RID, area: Node, area_shape_index: int, local
 		angular_damp = value
 		if core: _area().angular_damp = value
 
-var _parent_body: CollisionObjectDaicon
+var _parent_body: CollisionObject25D
 var _height_above_parent: float = 0.0
 var _body_counts: Dictionary = {}
 var _area_counts: Dictionary = {}
@@ -96,7 +96,7 @@ func _ready() -> void:
 	super._ready()
 	if Engine.is_editor_hint():
 		return
-	if footprint_size.x > 0.0 and footprint_size.y > 0.0 and not has_shape_child(CollisionShapeDaicon.Role.COLLISION):
+	if footprint_size.x > 0.0 and footprint_size.y > 0.0 and not has_shape_child(CollisionShape25D.Role.COLLISION):
 		var box := BoxShape3D.new()
 		box.size = Vector3(footprint_size.x / tile_size, area_height, footprint_size.y / tile_size)
 		add_shape_3d(box, Vector3(0.0, area_height / 2.0, 0.0))
@@ -123,7 +123,7 @@ func get_overlapping_bodies() -> Array[Node]:
 	return _owners(_area().get_overlapping_bodies())
 
 
-## The AreaDaicon nodes (or raw 3D areas) that overlap the area. One entry for each owner.
+## The Area25D nodes (or raw 3D areas) that overlap the area. One entry for each owner.
 func get_overlapping_areas() -> Array[Node]:
 	if not core: return [] as Array[Node]
 	return _owners(_area().get_overlapping_areas())
@@ -142,7 +142,7 @@ func overlaps_body(body: Node) -> bool:
 	return core != null and get_overlapping_bodies().has(from_3d(body))
 
 
-## Accepts an AreaDaicon or a raw Area3D.
+## Accepts an Area25D or a raw Area3D.
 func overlaps_area(area: Node) -> bool:
 	return core != null and get_overlapping_areas().has(from_3d(area))
 #endregion

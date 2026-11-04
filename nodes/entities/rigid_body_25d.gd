@@ -1,6 +1,6 @@
 @tool
 @icon("res://addons/daicon/icons/rigid_daicon.svg")
-class_name RigidBodyDaicon extends PhysicsBodyDaicon
+class_name RigidBody25D extends PhysicsBody25D
 ## A body that the physics engine moves, like RigidBody2D. The core is a RigidBody3D.
 ## Planar values are px on the ground plane (x = east, y = south). Vertical values are blocks.
 ## Gravity pulls down in 3D (-Y), so gravity_scale acts on vertical_velocity, not on linear_velocity.y.

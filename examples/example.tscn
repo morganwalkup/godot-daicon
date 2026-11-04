@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c12yxbiou142g" path="res://addons/daicon/examples/code/example.gd" id="1_wmyp6"]
 [ext_resource type="Texture2D" uid="uid://c6u4mv2ecvtel" path="res://addons/daicon/examples/assets/tileset.png" id="2_8clr1"]
-[ext_resource type="Script" uid="uid://th1q6bteyw03" path="res://addons/daicon/nodes/tile_map_layer_daicon.gd" id="2_pjyox"]
+[ext_resource type="Script" uid="uid://th1q6bteyw03" path="res://addons/daicon/nodes/tile_map_layer_25d.gd" id="2_pjyox"]
 [ext_resource type="MeshLibrary" uid="uid://rm1kdg06ylaf" path="res://addons/daicon/examples/mesh/tiles_mesh.tres" id="4_7cn0y"]
 [ext_resource type="Shader" uid="uid://dg8to3rkhyxqo" path="res://addons/daicon/shaders/blur_circle.gdshader" id="5_wmyp6"]
 [ext_resource type="PackedScene" uid="uid://bo8sog8wpw4n4" path="res://addons/daicon/examples/static_body_daicon.tscn" id="7_6rqat"]
@@ -91,7 +91,7 @@ shader_parameter/CircleBlur = 0.01
 [node name="Example" type="Node2D" node_paths=PackedStringArray("shader_trigger_nodes", "shader_target_nodes")]
 y_sort_enabled = true
 script = ExtResource("1_wmyp6")
-shader_trigger_nodes = [NodePath("Player"), NodePath("StaticBodyDaicon")]
+shader_trigger_nodes = [NodePath("Player"), NodePath("StaticBody25D")]
 shader_target_nodes = [NodePath("Map/-2"), NodePath("Map/-1"), NodePath("Map/0"), NodePath("Map/1"), NodePath("Map/2")]
 
 [node name="Map" type="Node2D" parent="."]
@@ -141,7 +141,7 @@ tile_set = SubResource("TileSet_8clr1")
 script = ExtResource("2_pjyox")
 mesh_library = ExtResource("4_7cn0y")
 
-[node name="StaticBodyDaicon" parent="." instance=ExtResource("7_6rqat")]
+[node name="StaticBody25D" parent="." instance=ExtResource("7_6rqat")]
 position = Vector2(161, 107)
 height = -1.0
 

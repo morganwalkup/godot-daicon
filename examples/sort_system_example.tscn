@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://cfiur8plu3wwj"]
 
-[ext_resource type="Script" uid="uid://b7kwquhi1movj" path="res://addons/daicon/nodes/daicon_node.gd" id="1_d45pw"]
+[ext_resource type="Script" uid="uid://b7kwquhi1movj" path="res://addons/daicon/nodes/root_25d.gd" id="1_d45pw"]
 [ext_resource type="PackedScene" uid="uid://d1sgg3bial5f7" path="res://addons/daicon/examples/player.tscn" id="2_mwxfw"]
 [ext_resource type="PackedScene" uid="uid://bo8sog8wpw4n4" path="res://addons/daicon/examples/static_body_daicon.tscn" id="3_nhb8p"]
 [ext_resource type="Texture2D" uid="uid://c6u4mv2ecvtel" path="res://addons/daicon/examples/assets/tileset.png" id="4_nce33"]
-[ext_resource type="Script" uid="uid://th1q6bteyw03" path="res://addons/daicon/nodes/tile_map_layer_daicon.gd" id="5_s7rhr"]
+[ext_resource type="Script" uid="uid://th1q6bteyw03" path="res://addons/daicon/nodes/tile_map_layer_25d.gd" id="5_s7rhr"]
 [ext_resource type="MeshLibrary" uid="uid://rm1kdg06ylaf" path="res://addons/daicon/examples/mesh/tiles_mesh.tres" id="6_hc7oc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ogekl"]
@@ -39,7 +39,7 @@ custom_data_layer_0/name = "Item"
 custom_data_layer_0/type = 2
 sources/0 = SubResource("TileSetAtlasSource_ogekl")
 
-[node name="Daicon" type="Node2D"]
+[node name="Root25D" type="Node2D"]
 y_sort_enabled = true
 script = ExtResource("1_d45pw")
 

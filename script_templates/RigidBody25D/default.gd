@@ -1,5 +1,5 @@
 @tool
-extends RigidBodyDaicon
+extends RigidBody25D
 
 func _ready() -> void:
 	super._ready()
