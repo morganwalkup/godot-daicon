@@ -1,8 +1,8 @@
 @tool
-@icon("res://addons/daicon/icons/daicon_map_layer.svg")
+@icon("res://addons/world_25d/icons/tile_map_layer_25d.svg")
 class_name NavigationRegion25D
 extends NavigationRegion3D
-## The 3D navmesh of one map (one streamed region), for NavigationAgent3D on Daicon body cores.
+## The 3D navmesh of one map (one streamed region), for NavigationAgent3D on 2.5D body cores.
 ## Put it as a direct child of the map's 2D root. Press "Bake navmesh" in the inspector.
 ## The bake reads the 3D blocks, ramps, and walls of every TileMapLayer25D under the parent,
 ## get_navigation_footprint() of every StaticBody25D, and a ground floor at height 0. It saves

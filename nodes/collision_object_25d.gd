@@ -1,10 +1,10 @@
 @tool
-@icon("res://addons/daicon/icons/daicon.svg")
+@icon("res://addons/world_25d/icons/node_25d.svg")
 class_name CollisionObject25D extends Node2D
-## Base of every Daicon body and area. The API is like CollisionObject2D, but a hidden 3D node
+## Base of every 2.5D body and area. The API is like CollisionObject2D, but a hidden 3D node
 ## (`core`) does the physics. 1 block = 1 tile = `tile_size` px.
 ##
-## Units (the same for every Daicon class):
+## Units (the same for every 2.5D class):
 ## - `position` / `global_position`: px, where the node draws. x = X, y = Z - height (in tiles).
 ## - Ground position: px on the ground plane under the node (X, Z). See get_ground_position().
 ## - `height`: blocks above the ground (3D Y). The core origin is at the feet.
@@ -19,7 +19,7 @@ const SAME_LEVEL_TOLERANCE: float = 0.75
 ## Height of the whisker bottom above the feet, in blocks. It must be more than the rise of a 45° ramp
 ## across the whisker half-width, or a body on a ramp sees the ramp as an occluder and draws under it.
 const WHISKER_LIFT: float = 0.35
-const OWNER_META := &"daicon_owner"
+const OWNER_META := &"owner_25d"
 
 ## The hidden 3D node. Read-only.
 var core: CollisionObject3D
@@ -148,18 +148,18 @@ func get_rid_3d() -> RID:
 	return core.get_rid() if core else RID()
 
 
-## The Daicon node that owns a 3D body or area, or the node itself if no Daicon node owns it.
+## The 2.5D node that owns a 3D body or area, or the node itself if no 2.5D node owns it.
 static func from_3d(node: Object) -> Object:
 	if node and node.has_meta(OWNER_META):
-		var daicon_owner: Object = node.get_meta(OWNER_META)
-		if is_instance_valid(daicon_owner): return daicon_owner
+		var owner_25d: Object = node.get_meta(OWNER_META)
+		if is_instance_valid(owner_25d): return owner_25d
 	return node
 
 
-## True in the editor for a node whose script is not @tool, for example a Daicon subclass without
+## True in the editor for a node whose script is not @tool, for example a 2.5D subclass without
 ## @tool. The editor gives such a node a placeholder script instance: its exported properties can
 ## be read, but a call to a script method or a read of a non-exported member is an error.
-## Editor (@tool) code must check this before it uses another Daicon node.
+## Editor (@tool) code must check this before it uses another 2.5D node.
 static func is_placeholder(node: Object) -> bool:
 	if not Engine.is_editor_hint() or not node: return false
 	var script := node.get_script() as Script
@@ -225,7 +225,7 @@ static func same_level_areas(area: Node) -> Array:
 	return result
 
 
-## Height of a node in blocks: the height of its nearest Daicon ancestor (or itself), or 0.
+## Height of a node in blocks: the height of its nearest 2.5D ancestor (or itself), or 0.
 static func height_of(node: Node) -> float:
 	var curr: Node = node
 	while curr:
@@ -235,7 +235,7 @@ static func height_of(node: Node) -> float:
 	return 0.0
 
 
-## Walks up the parent chain and returns the first Daicon ancestor, or null.
+## Walks up the parent chain and returns the first 2.5D ancestor, or null.
 static func find_parent_entity(node: Node) -> CollisionObject25D:
 	var curr: Node = node.get_parent()
 	while curr:

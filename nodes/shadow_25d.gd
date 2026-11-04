@@ -1,5 +1,5 @@
 @tool
-@icon("res://addons/daicon/icons/daicon_shadow.svg")
+@icon("res://addons/world_25d/icons/shadow_25d.svg")
 class_name Shadow25D extends Sprite2D
 
 #region Properties
@@ -61,7 +61,7 @@ func _notification(what: int) -> void:
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
-	if not CollisionObject25D.find_parent_entity(self):  warnings.append("Shadow25D must be a child node of a Daicon body or area.")
+	if not CollisionObject25D.find_parent_entity(self):  warnings.append("Shadow25D must be a child node of a 2.5D body or area.")
 	return warnings
 
 func _process(_delta: float) -> void:

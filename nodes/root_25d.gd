@@ -1,5 +1,5 @@
 @tool
-@icon("res://addons/daicon/icons/daicon.svg")
+@icon("res://addons/world_25d/icons/node_25d.svg")
 class_name Root25D extends Node2D
 
 @export var shader_trigger_nodes : Array[Node]

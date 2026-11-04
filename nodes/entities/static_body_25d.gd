@@ -1,5 +1,5 @@
 @tool
-@icon("res://addons/daicon/icons/static_daicon.svg")
+@icon("res://addons/world_25d/icons/static_body_25d.svg")
 class_name StaticBody25D extends PhysicsBody25D
 ## A still body, like StaticBody2D. The core is a StaticBody3D.
 ##

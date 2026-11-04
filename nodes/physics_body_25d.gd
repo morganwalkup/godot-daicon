@@ -1,6 +1,6 @@
 @tool
 class_name PhysicsBody25D extends CollisionObject25D
-## Base of the Daicon bodies, like PhysicsBody2D. `motion` vectors are on the ground plane in px.
+## Base of the 2.5D bodies, like PhysicsBody2D. `motion` vectors are on the ground plane in px.
 ## The extra last argument `motion_height` is a vertical motion in blocks.
 
 ## The capsule of a 1-block character is this much shorter than 1 block, so it fits under a deck
@@ -68,7 +68,7 @@ func remove_collision_exception_with(body: Node) -> void:
 	(core as PhysicsBody3D).remove_collision_exception_with(_core_of(body))
 
 
-## The bodies that this body ignores. Daicon cores are mapped to their Daicon nodes.
+## The bodies that this body ignores. 2.5D cores are mapped to their 2.5D nodes.
 func get_collision_exceptions() -> Array:
 	return (core as PhysicsBody3D).get_collision_exceptions().map(func(b: Node) -> Object: return CollisionObject25D.from_3d(b))
 

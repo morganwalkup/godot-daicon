@@ -1,13 +1,13 @@
 @tool
-@icon("res://addons/daicon/icons/daicon.svg")
+@icon("res://addons/world_25d/icons/node_25d.svg")
 class_name Area25D extends CollisionObject25D
 ## An area like Area2D. The core is an Area3D, so the overlap respects height: an area at another
 ## height does not overlap, and no same_level() filter is needed.
-## It detects Daicon bodies and other Area25D nodes. It does not detect Area2D or 2D bodies.
+## It detects 2.5D bodies and other Area25D nodes. It does not detect Area2D or 2D bodies.
 ##
 ## With no CollisionShape25D child, the node builds a box from footprint_size and area_height.
-## Inside a Daicon body, the stored `height` is the height above that body, and the area keeps it
-## when the body moves. get_height() returns the height above the ground, as on every Daicon node.
+## Inside a 2.5D body, the stored `height` is the height above that body, and the area keeps it
+## when the body moves. get_height() returns the height above the ground, as on every 2.5D node.
 ##
 ## Not mirrored: audio_bus_override and audio_bus_name (an Area3D changes only 3D audio),
 ## input_pickable and the mouse signals. The *_rid arguments of the shape signals are 3D RIDs.
@@ -117,7 +117,7 @@ func _ready() -> void:
 
 
 #region Area2D API
-## The Daicon nodes (or raw 3D bodies) that overlap the area. One entry for each owner.
+## The 2.5D nodes (or raw 3D bodies) that overlap the area. One entry for each owner.
 func get_overlapping_bodies() -> Array[Node]:
 	if not core: return [] as Array[Node]
 	return _owners(_area().get_overlapping_bodies())
@@ -137,7 +137,7 @@ func has_overlapping_areas() -> bool:
 	return core != null and _area().has_overlapping_areas()
 
 
-## Accepts a Daicon body or a raw 3D body.
+## Accepts a 2.5D body or a raw 3D body.
 func overlaps_body(body: Node) -> bool:
 	return core != null and get_overlapping_bodies().has(from_3d(body))
 
@@ -148,7 +148,7 @@ func overlaps_area(area: Node) -> bool:
 #endregion
 
 
-## Inside a Daicon body, this follows a height change of the body that does not move the drawn
+## Inside a 2.5D body, this follows a height change of the body that does not move the drawn
 ## position. A script that overrides it must call super._physics_process(delta).
 func _physics_process(_delta: float) -> void:
 	if _parent_body and not Engine.is_editor_hint(): _apply_position_write()
@@ -168,41 +168,41 @@ func _apply_position_write() -> void:
 func _owners(nodes: Array) -> Array[Node]:
 	var result: Array[Node] = []
 	for node: Node in nodes:
-		var daicon_owner := from_3d(node) as Node
-		if daicon_owner and not result.has(daicon_owner): result.append(daicon_owner)
+		var owner_25d := from_3d(node) as Node
+		if owner_25d and not result.has(owner_25d): result.append(owner_25d)
 	return result
 
 
 func _on_body_entered(body: Node) -> void:
-	var daicon_owner := from_3d(body) as Node
-	_body_counts[daicon_owner] = int(_body_counts.get(daicon_owner, 0)) + 1
-	if _body_counts[daicon_owner] == 1: body_entered.emit(daicon_owner)
+	var owner_25d := from_3d(body) as Node
+	_body_counts[owner_25d] = int(_body_counts.get(owner_25d, 0)) + 1
+	if _body_counts[owner_25d] == 1: body_entered.emit(owner_25d)
 
 
 func _on_body_exited(body: Node) -> void:
-	var daicon_owner := from_3d(body) as Node
-	var count: int = int(_body_counts.get(daicon_owner, 0)) - 1
+	var owner_25d := from_3d(body) as Node
+	var count: int = int(_body_counts.get(owner_25d, 0)) - 1
 	if count > 0:
-		_body_counts[daicon_owner] = count
+		_body_counts[owner_25d] = count
 		return
-	_body_counts.erase(daicon_owner)
-	body_exited.emit(daicon_owner)
+	_body_counts.erase(owner_25d)
+	body_exited.emit(owner_25d)
 
 
 func _on_area_entered(area: Area3D) -> void:
-	var daicon_owner := from_3d(area) as Node
-	_area_counts[daicon_owner] = int(_area_counts.get(daicon_owner, 0)) + 1
-	if _area_counts[daicon_owner] == 1: area_entered.emit(daicon_owner)
+	var owner_25d := from_3d(area) as Node
+	_area_counts[owner_25d] = int(_area_counts.get(owner_25d, 0)) + 1
+	if _area_counts[owner_25d] == 1: area_entered.emit(owner_25d)
 
 
 func _on_area_exited(area: Area3D) -> void:
-	var daicon_owner := from_3d(area) as Node
-	var count: int = int(_area_counts.get(daicon_owner, 0)) - 1
+	var owner_25d := from_3d(area) as Node
+	var count: int = int(_area_counts.get(owner_25d, 0)) - 1
 	if count > 0:
-		_area_counts[daicon_owner] = count
+		_area_counts[owner_25d] = count
 		return
-	_area_counts.erase(daicon_owner)
-	area_exited.emit(daicon_owner)
+	_area_counts.erase(owner_25d)
+	area_exited.emit(owner_25d)
 
 
 func _area() -> Area3D:

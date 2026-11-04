@@ -1,5 +1,5 @@
 @tool
-@icon("res://addons/daicon/icons/kinematic_daicon.svg")
+@icon("res://addons/world_25d/icons/character_body_25d.svg")
 class_name CharacterBody25D extends PhysicsBody25D
 ## A character body, like CharacterBody2D. A hidden CharacterBody3D (`core`) does the collision.
 ## Set `velocity` (px/s on the ground plane: x = east, y = south) and call move_and_slide().

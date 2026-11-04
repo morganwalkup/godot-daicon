@@ -1,5 +1,5 @@
 @tool
-@icon("res://addons/daicon/icons/rigid_daicon.svg")
+@icon("res://addons/world_25d/icons/rigid_body_25d.svg")
 class_name RigidBody25D extends PhysicsBody25D
 ## A body that the physics engine moves, like RigidBody2D. The core is a RigidBody3D.
 ## Planar values are px on the ground plane (x = east, y = south). Vertical values are blocks.
@@ -165,13 +165,13 @@ func _physics_process(_delta: float) -> void:
 
 
 #region RigidBody2D API
-## The Daicon nodes (or raw 3D bodies) that touch the body. Needs contact_monitor.
+## The 2.5D nodes (or raw 3D bodies) that touch the body. Needs contact_monitor.
 func get_colliding_bodies() -> Array[Node]:
 	var result: Array[Node] = []
 	if not core: return result
 	for other: Node3D in _rigid().get_colliding_bodies():
-		var daicon_owner := from_3d(other) as Node
-		if daicon_owner and not result.has(daicon_owner): result.append(daicon_owner)
+		var owner_25d := from_3d(other) as Node
+		if owner_25d and not result.has(owner_25d): result.append(owner_25d)
 	return result
 
 

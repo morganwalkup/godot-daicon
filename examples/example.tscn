@@ -1,12 +1,12 @@
 [gd_scene format=4 uid="uid://ckqo7xx5ntlpq"]
 
-[ext_resource type="Script" uid="uid://c12yxbiou142g" path="res://addons/daicon/examples/code/example.gd" id="1_wmyp6"]
-[ext_resource type="Texture2D" uid="uid://c6u4mv2ecvtel" path="res://addons/daicon/examples/assets/tileset.png" id="2_8clr1"]
-[ext_resource type="Script" uid="uid://th1q6bteyw03" path="res://addons/daicon/nodes/tile_map_layer_25d.gd" id="2_pjyox"]
-[ext_resource type="MeshLibrary" uid="uid://rm1kdg06ylaf" path="res://addons/daicon/examples/mesh/tiles_mesh.tres" id="4_7cn0y"]
-[ext_resource type="Shader" uid="uid://dg8to3rkhyxqo" path="res://addons/daicon/shaders/blur_circle.gdshader" id="5_wmyp6"]
-[ext_resource type="PackedScene" uid="uid://bo8sog8wpw4n4" path="res://addons/daicon/examples/static_body_daicon.tscn" id="7_6rqat"]
-[ext_resource type="PackedScene" uid="uid://d1sgg3bial5f7" path="res://addons/daicon/examples/player.tscn" id="8_h7cfd"]
+[ext_resource type="Script" uid="uid://c12yxbiou142g" path="res://addons/world_25d/examples/code/example.gd" id="1_wmyp6"]
+[ext_resource type="Texture2D" uid="uid://c6u4mv2ecvtel" path="res://addons/world_25d/examples/assets/tileset.png" id="2_8clr1"]
+[ext_resource type="Script" uid="uid://th1q6bteyw03" path="res://addons/world_25d/nodes/tile_map_layer_25d.gd" id="2_pjyox"]
+[ext_resource type="MeshLibrary" uid="uid://rm1kdg06ylaf" path="res://addons/world_25d/examples/mesh/tiles_mesh.tres" id="4_7cn0y"]
+[ext_resource type="Shader" uid="uid://dg8to3rkhyxqo" path="res://addons/world_25d/shaders/blur_circle.gdshader" id="5_wmyp6"]
+[ext_resource type="PackedScene" uid="uid://bo8sog8wpw4n4" path="res://addons/world_25d/examples/static_body_25d.tscn" id="7_6rqat"]
+[ext_resource type="PackedScene" uid="uid://d1sgg3bial5f7" path="res://addons/world_25d/examples/player.tscn" id="8_h7cfd"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7cn0y"]
 texture = ExtResource("2_8clr1")

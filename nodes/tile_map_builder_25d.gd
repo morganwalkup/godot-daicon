@@ -25,12 +25,12 @@ static func item_for(tile_set: TileSet, tile_data: TileData, mesh_library: MeshL
 			var item_name := String(value)
 			if item_name.is_empty() or not mesh_library: return GridMap.INVALID_CELL_ITEM
 			var item := mesh_library.find_item_by_name(item_name)
-			if item < 0: push_warning("Daicon: MeshLibrary has no item named '%s'." % item_name)
+			if item < 0: push_warning("World 2.5D: MeshLibrary has no item named '%s'." % item_name)
 			return item
 		TYPE_INT:
 			if Engine.is_editor_hint() and not _warned_int_layers.has(tile_set):
 				_warned_int_layers[tile_set] = true
-				push_warning("Daicon: TileSet '%s' has an int \"Item\" layer. Unset tiles become item 0 (Block). Use a String layer with item names instead." % tile_set.resource_path)
+				push_warning("World 2.5D: TileSet '%s' has an int \"Item\" layer. Unset tiles become item 0 (Block). Use a String layer with item names instead." % tile_set.resource_path)
 			return int(value)
 	return GridMap.INVALID_CELL_ITEM
 

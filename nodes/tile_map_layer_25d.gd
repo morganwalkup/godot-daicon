@@ -1,5 +1,5 @@
 @tool
-@icon("res://addons/daicon/icons/daicon_map_layer.svg")
+@icon("res://addons/world_25d/icons/tile_map_layer_25d.svg")
 class_name TileMapLayer25D extends TileMapLayer
 ## A TileMapLayer that also builds 3D collision: GridMap blocks from the "Item" custom data, and
 ## (with extrude_physics) 3D walls from the 2D physics polygons. The whole native TileMapLayer API
@@ -74,7 +74,7 @@ var _built_level := 0
 		size = v_3
 	get():
 		return size
-## Offset of the 3D cells from the 2D tiles. Upstream Daicon uses (0, 0, -0.5).
+## Offset of the 3D cells from the 2D tiles. The upstream plugin uses (0, 0, -0.5).
 ## Use (0, 0, 0) to put a tile's top face exactly on the tile drawn in 2D.
 @export_custom(PROPERTY_HINT_NONE, "suffix:m") var cell_offset: Vector3 = Vector3(0, 0, -0.5):
 	set(v_3):

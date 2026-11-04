@@ -1,6 +1,6 @@
 @tool
 class_name CollisionShape25D extends Node2D
-## A 3D shape for its parent Daicon body or area, like CollisionShape2D for a 2D body.
+## A 3D shape for its parent 2.5D body or area, like CollisionShape2D for a 2D body.
 ## The 2D position is an offset on the ground plane, in px. `offset_3d` adds a 3D offset in blocks
 ## from the feet. At runtime the node puts a CollisionShape3D under the parent's core.
 ##
@@ -52,7 +52,7 @@ func _notification(what: int) -> void:
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
 	if not get_parent() is CollisionObject25D:
-		warnings.append("CollisionShape25D must be a direct child of a Daicon body or area.")
+		warnings.append("CollisionShape25D must be a direct child of a 2.5D body or area.")
 	if not shape:
 		warnings.append("A shape must be set.")
 	return warnings

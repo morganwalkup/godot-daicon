@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d2tdv6tay5iy8"
-path="res://.godot/imported/static_daicon.svg-b87dfab1b70183876075d5e178469a1a.ctex"
+uid="uid://c3u2ykxoqt1nn"
+path="res://.godot/imported/rigid_body_25d.svg-cc8e773ab448267bfd86668b6a70d4c6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/daicon/icons/static_daicon.svg"
-dest_files=["res://.godot/imported/static_daicon.svg-b87dfab1b70183876075d5e178469a1a.ctex"]
+source_file="res://addons/world_25d/icons/rigid_body_25d.svg"
+dest_files=["res://.godot/imported/rigid_body_25d.svg-cc8e773ab448267bfd86668b6a70d4c6.ctex"]
 
 [params]
 

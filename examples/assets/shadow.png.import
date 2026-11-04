@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://rvj40e0hpbx3"
-path="res://.godot/imported/shadow.png-b31014df897152b952a19a6f35942a48.ctex"
+path="res://.godot/imported/shadow.png-f0d69a2977b2e8c5358359b23e97209e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/daicon/examples/assets/shadow.png"
-dest_files=["res://.godot/imported/shadow.png-b31014df897152b952a19a6f35942a48.ctex"]
+source_file="res://addons/world_25d/examples/assets/shadow.png"
+dest_files=["res://.godot/imported/shadow.png-f0d69a2977b2e8c5358359b23e97209e.ctex"]
 
 [params]
 

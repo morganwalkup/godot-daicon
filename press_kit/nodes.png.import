@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ccshgtj1rxm6k"
-path="res://.godot/imported/nodes.png-1c4ea4ca654531f7fa5ad56e312a73f8.ctex"
+path="res://.godot/imported/nodes.png-1b654aa473c66ebf3de843eb3478f5ca.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/daicon/press_kit/nodes.png"
-dest_files=["res://.godot/imported/nodes.png-1c4ea4ca654531f7fa5ad56e312a73f8.ctex"]
+source_file="res://addons/world_25d/press_kit/nodes.png"
+dest_files=["res://.godot/imported/nodes.png-1b654aa473c66ebf3de843eb3478f5ca.ctex"]
 
 [params]
 

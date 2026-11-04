@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://t1smsghqydb5"
-path="res://.godot/imported/kinematic_daicon.svg-f15b18b201751a2a1e77ab56663bd72f.ctex"
+uid="uid://cyl2q2m4pcvmu"
+path="res://.godot/imported/tile_map_layer_25d.svg-2d43561015ea86259d5e1c0b87788e9b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/daicon/icons/kinematic_daicon.svg"
-dest_files=["res://.godot/imported/kinematic_daicon.svg-f15b18b201751a2a1e77ab56663bd72f.ctex"]
+source_file="res://addons/world_25d/icons/tile_map_layer_25d.svg"
+dest_files=["res://.godot/imported/tile_map_layer_25d.svg-2d43561015ea86259d5e1c0b87788e9b.ctex"]
 
 [params]
 

@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dtlt2q8cl2oec"
-path="res://.godot/imported/blocks.blend-7c956106e7ef4eabbd1aaed8ef0e4a13.scn"
+path="res://.godot/imported/blocks.blend-68d26628ab4ac875aa6722bc484e67b0.scn"
 
 [deps]
 
-source_file="res://addons/daicon/mesh/blocks.blend"
-dest_files=["res://.godot/imported/blocks.blend-7c956106e7ef4eabbd1aaed8ef0e4a13.scn"]
+source_file="res://addons/world_25d/mesh/blocks.blend"
+dest_files=["res://.godot/imported/blocks.blend-68d26628ab4ac875aa6722bc484e67b0.scn"]
 
 [params]
 

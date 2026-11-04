@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cwpmbitw01x73"
-path="res://.godot/imported/daicon_docs_logo.png-1838975ac5444fb37bec0a8380d5db5e.ctex"
+uid="uid://cbpf63qrkffpf"
+path="res://.godot/imported/shadow_25d.svg-6eb57e0e452706e94681a8a4611dca90.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/daicon/press_kit/daicon_docs_logo.png"
-dest_files=["res://.godot/imported/daicon_docs_logo.png-1838975ac5444fb37bec0a8380d5db5e.ctex"]
+source_file="res://addons/world_25d/icons/shadow_25d.svg"
+dest_files=["res://.godot/imported/shadow_25d.svg-6eb57e0e452706e94681a8a4611dca90.ctex"]
 
 [params]
 
@@ -38,3 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false
