@@ -26,6 +26,7 @@ var core: CollisionObject3D
 ## The draw-order area, or null. 3D bodies inside it are in front of this node, so it draws under them.
 var whisker: Area3D
 var _occluder: StaticBody3D
+var _last_synced: Vector2 = Vector2(INF, INF)
 
 ## How many pixels are 1 block.
 @export var tile_size: int = 16:
@@ -46,6 +47,9 @@ var _occluder: StaticBody3D
 @export var z_step: int = 10
 ## Height of the node in blocks, for the draw order.
 @export var z_sort_coef: float = 1.0
+## Rounds the drawn position to whole pixels after each sync, against pixel-art jitter.
+## The core does not move.
+@export var pixel_snap: bool = false
 ## Rotation of the core, in radians. 2D rotation does not affect the core.
 @export_custom(PROPERTY_HINT_RANGE, "-360,360,0.1,or_less,or_greater,radians") var rotation_3d: Vector3 = Vector3.ZERO:
 	set(value):
@@ -83,6 +87,29 @@ func _ready() -> void:
 	for child: Node in get_children():
 		if child is CollisionShapeDaicon: (child as CollisionShapeDaicon).attach()
 	core.set_meta("z_index", z_index)
+	if not Engine.is_editor_hint():
+		_last_synced = _get_position_2d()
+		set_notify_transform(true)
+
+
+## A write to `position` or `global_position` at runtime moves the core there and keeps the height,
+## as a write moves a built-in body. A parent move does the same.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSFORM_CHANGED:
+		_apply_position_write()
+
+
+## Moves the core to a 2D position written since the last sync. The transform notification of a
+## CanvasItem is deferred, so a physics move must call this first or the sync loses the write.
+func _apply_position_write() -> void:
+	if Engine.is_editor_hint() or not core or not is_inside_tree():
+		return
+	var written := global_position
+	if written.is_equal_approx(_last_synced):
+		return
+	var h: float = core.position.y
+	core.position = Vector3(written.x / tile_size, h, written.y / tile_size + h)
+	_sync_from_core()
 
 
 func _process(_delta: float) -> void:
@@ -323,6 +350,10 @@ func _get_position_2d() -> Vector2:
 
 
 func _set_position_2d(value: Vector2) -> void:
-	if is_inside_tree(): global_position = value
-	else: position = value
+	if pixel_snap and not Engine.is_editor_hint(): value = value.round()
+	if is_inside_tree():
+		_last_synced = value
+		global_position = value
+	else:
+		position = value
 #endregion
