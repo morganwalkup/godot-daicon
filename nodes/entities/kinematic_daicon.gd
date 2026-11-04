@@ -1,6 +1,6 @@
 @tool
 @icon("res://addons/daicon/icons/kinematic_daicon.svg")
-class_name KinematicDaicon extends DaiconEntity
+class_name KinematicDaicon extends PhysicsBodyDaicon
 
 
 #region Kinematic Specific Exports

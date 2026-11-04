@@ -43,7 +43,7 @@ class_name DaiconShadow extends Sprite2D
 #region Variables
 const SHAPE_NAME = "ShadowShapeCast"
 
-var parent_entity: DaiconEntity
+var parent_entity: CollisionObjectDaicon
 var shape_cast: ShapeCast3D
 var _debug_layer: Node2D
 #endregion
@@ -61,7 +61,7 @@ func _notification(what: int) -> void:
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
-	if not DaiconEntity.find_parent_entity(self):  warnings.append("DaiconShadow must be a child node of DaiconEntity!")
+	if not CollisionObjectDaicon.find_parent_entity(self):  warnings.append("DaiconShadow must be a child node of a Daicon body or area.")
 	return warnings
 
 func _process(_delta: float) -> void:
@@ -82,7 +82,7 @@ func _process(_delta: float) -> void:
 #endregion
 
 #region Core Setup
-func _find_entity() -> void: parent_entity = DaiconEntity.find_parent_entity(self)
+func _find_entity() -> void: parent_entity = CollisionObjectDaicon.find_parent_entity(self)
 
 func _inject_shapecast() -> void:
 	if not parent_entity or not parent_entity.core: return
@@ -117,7 +117,7 @@ func _update_shadow_projection() -> void:
 	if not parent_entity or not parent_entity.core: return
 	
 	var height_size := float(parent_entity.tile_size)
-	var core_local_y: float = parent_entity.core.position.y - parent_entity.offset_3d.y
+	var core_local_y: float = parent_entity.core.position.y
 	var floor_y: float = 0.0
 	var distance: float = 0.0
 	var hit_floor := false

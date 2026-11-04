@@ -1,6 +1,6 @@
 @tool
 @icon("res://addons/daicon/icons/rigid_daicon.svg")
-class_name RigidDaicon extends DaiconEntity
+class_name RigidDaicon extends PhysicsBodyDaicon
 
 
 #region Rigid Specific Exports

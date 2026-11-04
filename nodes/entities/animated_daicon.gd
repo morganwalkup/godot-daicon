@@ -1,6 +1,6 @@
 @tool
 @icon("res://addons/daicon/icons/animated_daicon.svg")
-class_name AnimatedDaicon extends DaiconEntity
+class_name AnimatedDaicon extends PhysicsBodyDaicon
 
 
 #region Animatable Specific Exports

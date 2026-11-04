@@ -1,6 +1,6 @@
 @tool
 @icon("res://addons/daicon/icons/static_daicon.svg")
-class_name StaticDaicon extends DaiconEntity
+class_name StaticDaicon extends PhysicsBodyDaicon
 
 
 #region Static Specific Exports
