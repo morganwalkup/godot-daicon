@@ -326,14 +326,15 @@ func _init_core() -> void:
 	var position_2d := _get_position_2d()
 	core = _create_core()
 	core.set_meta(OWNER_META, self)
-	add_child(core)
-	move_child(core, 0)
 	core.disable_mode = disable_mode
 	core.collision_layer = collision_layer
 	core.collision_mask = collision_mask
 	core.collision_priority = collision_priority
 	core.rotation = rotation_3d
+	# Before add_child: an AnimatableBody3D with sync_to_physics reverts a later write until the physics step.
 	core.position = Vector3(position_2d.x / tile_size, start_height, position_2d.y / tile_size + start_height)
+	add_child(core)
+	move_child(core, 0)
 
 
 func _sync_from_core() -> void:
