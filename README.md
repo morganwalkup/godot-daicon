@@ -23,19 +23,30 @@ Simulating 3D depth for a 2D game usually means picking between two established,
 ---
 
 ## Features
- 
-- A family of ready-to-use nodes for 2.5D gameplay:
-  - `Daicon` — base node for 2.5D positioning
-  - `DaiconEntity` — base entity class shared by all Daicon body types
-  - `StaticDaicon` — static 2.5D objects
-  - `KinematicDaicon` — movable, controller-driven 2.5D bodies
-  - `RigidDaicon` — physics-driven 2.5D bodies
-  - `AnimatedDaicon` — animated 2.5D entities
-  - `DaiconMap` / `DaiconMapLayer` — tilemap support with 2.5D depth
-  - `DaiconShadow` — drop shadows for 2.5D objects
-- Custom shaders (`circle`, `blur_circle`) for shadow and depth effects
-- Editor script templates for every node type, so new scripts are pre-wired
-- Example project included, showing all node types in action
+
+In this fork, each Daicon node has the API of the Godot built-in 2D node with the same role. Code that you write for `CharacterBody2D` reads the same on `CharacterBodyDaicon`, except for the breaks in [Where the API differs](#where-the-api-differs).
+
+| Daicon node | Built-in model | Hidden 3D node (`core`) |
+|---|---|---|
+| `CollisionObjectDaicon` | `CollisionObject2D` | (base class) |
+| `PhysicsBodyDaicon` | `PhysicsBody2D` | (base class) |
+| `StaticBodyDaicon` | `StaticBody2D` | `StaticBody3D` |
+| `AnimatableBodyDaicon` | `AnimatableBody2D` | `AnimatableBody3D` |
+| `RigidBodyDaicon` | `RigidBody2D` | `RigidBody3D` |
+| `CharacterBodyDaicon` | `CharacterBody2D` | `CharacterBody3D` |
+| `AreaDaicon` | `Area2D` | `Area3D` |
+| `CollisionShapeDaicon` | `CollisionShape2D` | `CollisionShape3D` |
+| `TileMapLayerDaicon` | `TileMapLayer` | `GridMap` and a wall `StaticBody3D` |
+| `NavigationRegionDaicon` | `NavigationRegion3D` | (it is a `NavigationRegion3D`) |
+
+Other nodes:
+
+- `Daicon` — a root node with the shader trigger and target lists of the examples.
+- `DaiconShadow` — drop shadows for 2.5D objects.
+- `KinematicCollisionDaicon` — the collision result of `move_and_collide()` and `get_slide_collision()`.
+- Custom shaders (`circle`, `blur_circle`) for see-through effects.
+- Editor script templates for the body nodes.
+- Example scenes in `examples/` that use the body nodes, `TileMapLayerDaicon`, and `CollisionShapeDaicon`.
 
 ![NODES](https://github.com/user-attachments/assets/fd7c5759-a461-488b-a838-b340924e372b)
 
@@ -51,18 +62,99 @@ Simulating 3D depth for a 2D game usually means picking between two established,
 > Daicon ships with ready-made script templates in `addons/daicon/script_templates`. Copy them into your project's own `script_templates` folder to have new Daicon scripts pre-wired when you create them from the editor.
 
 > [!IMPORTANT]
-> Requires Godot **4.5+** with the Forward+ renderer.
+> Requires Godot **4.5+** with the Forward+ renderer. This fork is tested on Godot 4.7.
 
 ---
 
 ## Quick Start
 
-1. Add a `Daicon`-family node (e.g. `KinematicDaicon`) to your scene.
-2. Position it in 3D space — Daicon handles projecting it correctly onto the 2D view.
-3. Check the `examples/` folder in this repository for a working demo scene (`example.tscn`) using every node type.
+1. Add a `TileMapLayerDaicon` with a TileSet that has a String `Item` custom data layer, and set its `mesh_library` (for example `mesh/blocks.tres`).
+2. Add a `CharacterBodyDaicon`. Turn on `use_gravity`, and write a script from the template:
+
+```gdscript
+extends CharacterBodyDaicon
+
+func _physics_process(_delta: float) -> void:
+	velocity = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down") * 80.0
+	move_and_slide()
+```
+
+3. Open `examples/example.tscn` for a working demo scene.
 
 > [!NOTE]
-> Full docs, guides, and API reference: [daicon-docs.readthedocs.io](https://daicon-docs.readthedocs.io/en/latest/)
+> Upstream docs, guides, and API reference: [daicon-docs.readthedocs.io](https://daicon-docs.readthedocs.io/en/latest/). They describe the upstream API, not the built-in names of this fork.
+
+---
+
+## Units and coordinates
+
+One rule applies to every Daicon node. 1 block = 1 tile = `tile_size` px (16 by default).
+
+| Value | Unit | Meaning |
+|---|---|---|
+| `position`, `global_position` | px | Where the node draws: x = X, y = Z − height. |
+| Ground position (`get_ground_position()`) | px | The point on the ground plane under the feet: (X, Z). |
+| `height` | blocks | The 3D Y of the feet. The `core` origin is at the feet. |
+| `velocity`, `linear_velocity`, `constant_linear_velocity` | px/s | On the ground plane: x = east, y = south. Not the drawn screen velocity. |
+| `vertical_velocity`, `constant_vertical_velocity` | blocks/s | Up is positive. |
+| `safe_margin`, `floor_snap_length`, `footprint_size`, `footprint_radius` | px | Converted to blocks for the core. |
+| `collision_layer`, `collision_mask` | 3D layer bits | Forwarded to the core. |
+
+A write to `position` or `global_position` at runtime moves the core there and keeps the height, as a write moves a built-in body. Use `teleport(position, height)` to set a height as well.
+
+---
+
+## Where the API differs
+
+| # | Difference | Reason | What to use |
+|---|---|---|---|
+| B1 | `velocity` is on the ground plane, not the drawn screen velocity. | The world has height. On a north ramp the drawn y changes more than the ground y. | Read `get_ground_position()` for ground motion. |
+| B2 | Height is separate. | 2D has no third axis. | `height`, `vertical_velocity`, `jump()`. |
+| B3 | Gravity acts on `vertical_velocity`, not on `velocity.y`. | Same reason as B2. | `use_gravity` (off by default, as on the built-in), `gravity_3d`, `apply_gravity(delta)`. |
+| B4 | Normals, collisions, and `get_gravity()` are projected or 3D. | 2D types cannot hold them. | `KinematicCollisionDaicon`, `Vector3` returns, and the `_3d` variants. |
+| B5 | Some members are not defined. | No meaning or no 3D counterpart. | See [Not mirrored](#not-mirrored). |
+| B6 | `Area2D` and Daicon nodes do not detect each other. | Daicon nodes are 3D. | `AreaDaicon`, or an `Area2D` with `CollisionObjectDaicon.same_level_areas()`. |
+| B7 | 2D `rotation` and `scale` do not turn or scale the 3D shapes. | `Node2D` owns these members. | `rotation_3d`, and the shape size. |
+| B8 | There is no `get_rid()`. | A 3D RID passed to `PhysicsServer2D` fails silently. | `get_rid_3d()`. |
+| B9 | Planar lengths convert px to blocks. | The core works in blocks. | The inspector shows `px` and `blocks` suffixes. |
+| B10 | Navigation is 3D. | The navmesh is 3D. | `NavigationAgent3D` on a "Feet" node under the core, and `NavigationRegionDaicon`. |
+| B11 | A position write keeps the current height. | A 2D position alone is ambiguous on a cliff. | `teleport(position, height)`. |
+
+### Not mirrored
+
+| Class | Members that are not defined |
+|---|---|
+| `CollisionObjectDaicon` | `input_pickable`, `input_event`, `mouse_entered/exited`, `mouse_shape_entered/exited`, `get_rid()`, the shape-owner API (use `CollisionShapeDaicon` children). |
+| `CharacterBodyDaicon` | `up_direction` (up is always 3D Y; `up_direction_3d` exists for rare cases). |
+| `StaticBodyDaicon` | A `Vector2` `constant_angular_velocity` (it is a float yaw rate). |
+| `RigidBodyDaicon` | `_integrate_forces(state)` (define `_integrate_forces_3d(state)` instead), a `Vector2` `center_of_mass` (it is a `Vector3` in blocks). |
+| `AreaDaicon` | `audio_bus_override`, `audio_bus_name` (an `Area3D` changes only 3D audio). The shape signal RIDs are 3D. |
+| `CollisionShapeDaicon` | `one_way_collision`, `one_way_collision_margin`. The `shape` is a `Shape3D`. |
+| `TileMapLayerDaicon` | `get_coords_for_body_rid()` accepts only 2D RIDs. A native method cannot be overridden. |
+
+---
+
+## Nodes
+
+### Bodies
+
+- `CharacterBodyDaicon` builds a capsule from `footprint_radius` and `body_height` when it has no `CollisionShapeDaicon` child. It builds a whisker (the draw-order area) when `whisker_reach` is above 0.
+- `StaticBodyDaicon` builds a box from `footprint_size` and `wall_height` when it has no `CollisionShapeDaicon` child. With `occluder_height` above 0, it also builds an occluder box. `navigation_obstacle` adds a `NavigationObstacle3D`. `get_navigation_footprint()` gives the box that `NavigationRegionDaicon` bakes.
+- `AnimatableBodyDaicon` extends `StaticBodyDaicon`. Move it with `position` (a Tween or an AnimationPlayer track), and lift it with `height`. It is never baked into the navmesh.
+- `RigidBodyDaicon` re-emits `body_entered`, `body_exited`, and `sleeping_state_changed` with Daicon nodes.
+- `AreaDaicon` overlaps in 3D, so an area at another height does not overlap. Inside a Daicon body, its stored `height` is the height above that body.
+
+### Shapes
+
+A `CollisionShapeDaicon` child adds its `Shape3D` to the core of its parent. `offset_3d` is the local 3D offset in blocks from the feet. `role` puts the shape on the core (`COLLISION`), the whisker (`WHISKER`), or the occluder (`OCCLUDER`).
+
+### Maps
+
+`TileMapLayerDaicon` gets its level from `z_index` / `z_step`, or from `level` when `level_from_z_index` is off. A collision with its `GridMap` or its walls maps to the layer through `CollisionObjectDaicon.from_3d()`, so gameplay code can test `collider is TileMapLayerDaicon`.
+
+### Navigation
+
+`NavigationRegionDaicon` bakes in the editor from the `TileMapLayerDaicon` nodes and the still `StaticBodyDaicon` nodes under its parent. It saves `<scene>_nav.tres` next to the scene. The bake settings (`agent_*`, `cell_*`, `border_size`, `geometry_collision_mask`) are exports.
 
 ---
 
@@ -70,14 +162,15 @@ Simulating 3D depth for a 2D game usually means picking between two established,
 
 This fork is used by Kinsprit. It differs from upstream Daicon:
 
+- The node classes use the names and the API of the Godot built-in 2D nodes (see [Features](#features)). The old names (`DaiconEntity`, `StaticDaicon`, `KinematicDaicon`, `RigidDaicon`, `AnimatedDaicon`, `DaiconMapLayer`) are gone, with no aliases. `DaiconMap` (the legacy `TileMap` class) is deleted.
+- The slot system (`*_properties` dictionaries) is deleted. `CollisionShapeDaicon` children and code-built default shapes replace it.
 - The repository root is the addon, so it mounts at `addons/daicon`. `blocks.blend` and `blocks.tscn` are in `mesh/source/` behind a `.gdignore`, so a project imports `mesh/blocks.tres` without Blender.
-- `DaiconEntity` and the map GridMaps use global 2D positions. Maps and entities under an offset parent collide in the correct place.
+- Daicon nodes and the map GridMaps use global 2D positions. Maps and bodies under an offset parent collide in the correct place.
 - The TileSet `Item` custom data layer can be a String (a MeshLibrary item name). An empty value means no block. Int layers still work.
-- `DaiconMapLayer` gets its level from `z_index` / `z_step` (as `DaiconMap` does), or from an explicit `level` when `level_from_z_index` is off. `cell_offset` is an export (upstream default `(0, 0, -0.5)`).
 - Maps rebuild when cells change, and when `level` or `z_step` changes.
 - `extrude_physics` turns the 2D tile physics polygons into 3D walls on `extrusion_layer`. `disable_2d_collision` (on by default) turns off the 2D physics of the layer at runtime.
-- The whisker uses the lowest z of all overlapping occluders and skips the entity's own body. The entity `mask` uses 3D physics flags.
-- `DaiconMapBuilder` holds the map build code that `DaiconMap` and `DaiconMapLayer` share.
+- The whisker uses the lowest z of all overlapping occluders and skips the body's own core.
+- `DaiconMapBuilder` holds the map build code of `TileMapLayerDaicon`.
 
 ---
 

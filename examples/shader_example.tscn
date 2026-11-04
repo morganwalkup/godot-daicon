@@ -1,12 +1,12 @@
-[gd_scene load_steps=21 format=4 uid="uid://djpcak2vydegu"]
+[gd_scene format=4 uid="uid://djpcak2vydegu"]
 
 [ext_resource type="Script" uid="uid://c12yxbiou142g" path="res://addons/daicon/examples/code/example.gd" id="1_jtpl2"]
 [ext_resource type="Texture2D" uid="uid://c6u4mv2ecvtel" path="res://addons/daicon/examples/assets/tileset.png" id="2_ku1xe"]
 [ext_resource type="Shader" uid="uid://dg8to3rkhyxqo" path="res://addons/daicon/shaders/blur_circle.gdshader" id="2_m256f"]
-[ext_resource type="Script" uid="uid://bj3f5k0rtx2vv" path="res://addons/daicon/nodes/daicon_map.gd" id="3_m256f"]
+[ext_resource type="Script" uid="uid://th1q6bteyw03" path="res://addons/daicon/nodes/tile_map_layer_daicon.gd" id="3_m256f"]
 [ext_resource type="MeshLibrary" uid="uid://rm1kdg06ylaf" path="res://addons/daicon/examples/mesh/tiles_mesh.tres" id="4_tqpdw"]
 [ext_resource type="Shader" uid="uid://cykmh24d835l3" path="res://addons/daicon/shaders/circle.gdshader" id="6_tqpdw"]
-[ext_resource type="PackedScene" uid="uid://bo8sog8wpw4n4" path="res://addons/daicon/examples/static_daicon.tscn" id="7_jtpl2"]
+[ext_resource type="PackedScene" uid="uid://bo8sog8wpw4n4" path="res://addons/daicon/examples/static_body_daicon.tscn" id="7_jtpl2"]
 [ext_resource type="PackedScene" uid="uid://d1sgg3bial5f7" path="res://addons/daicon/examples/player.tscn" id="8_lbvrf"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jtpl2"]
@@ -134,15 +134,11 @@ shader_parameter/CircleBlur = 0.01
 [node name="Daicon" type="Node2D" node_paths=PackedStringArray("shader_trigger_nodes", "shader_target_nodes")]
 y_sort_enabled = true
 script = ExtResource("1_jtpl2")
-shader_trigger_nodes = [NodePath("Player"), NodePath("StaticDaicon_1"), NodePath("StaticDaicon_2")]
+shader_trigger_nodes = [NodePath("Player"), NodePath("StaticBodyDaicon_1"), NodePath("StaticBodyDaicon_2")]
 shader_target_nodes = [NodePath("Blur/-1"), NodePath("Circle/-1"), NodePath("Blur/0"), NodePath("Circle/0"), NodePath("Blur/1"), NodePath("Circle/1"), NodePath("Blur/2"), NodePath("Circle/2")]
 
-[node name="Blur" type="TileMap" parent="."]
+[node name="Blur" type="Node2D" parent="."]
 y_sort_enabled = true
-tile_set = SubResource("TileSet_lbvrf")
-format = 2
-script = ExtResource("3_m256f")
-mesh_library = ExtResource("4_tqpdw")
 
 [node name="-1" type="TileMapLayer" parent="Blur"]
 z_index = -10
@@ -150,12 +146,16 @@ y_sort_enabled = true
 material = SubResource("ShaderMaterial_k5xfw")
 tile_map_data = PackedByteArray("AAD2/wAAAAABAAAAAAD3/wAAAAABAAAAAAD4/wAAAAABAAAAAAD5/wAAAAABAAAAAAD6/wAAAAABAAAAAAD7/wAAAAABAAAAAAD8/wAAAAABAAAAAAD9/wAAAAABAAAAAAD+/wAAAAABAAAAAAD1/wAAAAABAAAAAAD1/wMAAAABAAAAAAD2/wMAAAABAAAAAAD3/wMAAAABAAAAAAD4/wMAAAABAAAAAAD5/wMAAAABAAAAAAD6/wMAAAABAAAAAAD7/wMAAAABAAAAAAD8/wMAAAABAAAAAAD9/wMAAAABAAAAAAD+/wMAAAABAAAAAAD//wMAAAABAAAAAAA=")
 tile_set = SubResource("TileSet_lbvrf")
+script = ExtResource("3_m256f")
+mesh_library = ExtResource("4_tqpdw")
 
 [node name="0" type="TileMapLayer" parent="Blur"]
 y_sort_enabled = true
 material = SubResource("ShaderMaterial_cafgl")
 tile_map_data = PackedByteArray("AAD2//3/AAAAAAEAAAD2//7/AAAAAAEAAAD2////AAABAAAAAAD3//3/AAAAAAEAAAD3//7/AAAAAAEAAAD3////AAABAAAAAAD4//3/AAAAAAEAAAD4//7/AAAAAAEAAAD4////AAABAAAAAAD5//3/AAAAAAEAAAD5//7/AAAAAAEAAAD5////AAAAAAEAAAD6//3/AAAAAAEAAAD6//7/AAAAAAEAAAD6////AAAAAAEAAAD7//3/AAAAAAEAAAD7//7/AAAAAAEAAAD7////AAABAAAAAAD8//3/AAAAAAEAAAD8//7/AAAAAAEAAAD8////AAABAAAAAAD9//3/AAAAAAEAAAD9//7/AAAAAAEAAAD9////AAABAAAAAAD+//3/AAAAAAEAAAD+//7/AAAAAAEAAAD+////AAAAAAEAAAD1//3/AAAAAAEAAAD1//7/AAAAAAEAAAD1////AAAAAAEAAAD1/wEAAAAAAAEAAAD1/wIAAAAAAAEAAAD2/wEAAAAAAAEAAAD2/wIAAAAAAAEAAAD3/wEAAAAAAAEAAAD3/wIAAAAAAAEAAAD4/wEAAAAAAAEAAAD4/wIAAAAAAAEAAAD5/wEAAAAAAAEAAAD5/wIAAAAAAAEAAAD6/wEAAAAAAAEAAAD6/wIAAAAAAAEAAAD7/wEAAAAAAAEAAAD7/wIAAAABAAAAAAD8/wEAAAAAAAEAAAD8/wIAAAABAAAAAAD9/wEAAAAAAAEAAAD9/wIAAAABAAAAAAD+/wEAAAAAAAEAAAD+/wIAAAAAAAEAAAD//wEAAAAAAAEAAAD//wIAAAAAAAEAAAD1/wAAAAAAAAEAAAD2/wAAAAAAAAEAAAD3/wAAAAAAAAEAAAD4/wAAAAAAAAEAAAD5/wAAAAAAAAEAAAD6/wAAAAAAAAEAAAD7/wAAAAAAAAEAAAD8/wAAAAAAAAEAAAD9/wAAAAAAAAEAAAD+/wAAAAAAAAEAAAD//wAAAAAAAAEAAAA=")
 tile_set = SubResource("TileSet_lbvrf")
+script = ExtResource("3_m256f")
+mesh_library = ExtResource("4_tqpdw")
 
 [node name="1" type="TileMapLayer" parent="Blur"]
 z_index = 10
@@ -163,6 +163,8 @@ y_sort_enabled = true
 material = SubResource("ShaderMaterial_ho0iv")
 tile_map_data = PackedByteArray("AAD3//7/AAABAAAAAAD4//7/AAABAAAAAAD8//7/AAABAAAAAAD9//7/AAABAAAAAAD2//7/AAABAAAAAAD7//7/AAABAAAAAAD7/wEAAAABAAAAAAD8/wEAAAABAAAAAAD9/wEAAAABAAAAAAA=")
 tile_set = SubResource("TileSet_lbvrf")
+script = ExtResource("3_m256f")
+mesh_library = ExtResource("4_tqpdw")
 
 [node name="2" type="TileMapLayer" parent="Blur"]
 z_index = 20
@@ -170,13 +172,11 @@ y_sort_enabled = true
 material = SubResource("ShaderMaterial_6m1ea")
 tile_map_data = PackedByteArray("AAD3//3/AAAAAAAAAAD4//3/AAAAAAAAAAD8//3/AAAAAAAAAAD9//3/AAAAAAAAAAD2//3/AAAAAAAAAAD7//3/AAAAAAAAAAD7/wAAAAAAAAAAAAD8/wAAAAAAAAAAAAD9/wAAAAAAAAAAAAA=")
 tile_set = SubResource("TileSet_lbvrf")
-
-[node name="Circle" type="TileMap" parent="."]
-y_sort_enabled = true
-tile_set = SubResource("TileSet_cafgl")
-format = 2
 script = ExtResource("3_m256f")
 mesh_library = ExtResource("4_tqpdw")
+
+[node name="Circle" type="Node2D" parent="."]
+y_sort_enabled = true
 
 [node name="-1" type="TileMapLayer" parent="Circle"]
 z_index = -10
@@ -184,12 +184,16 @@ y_sort_enabled = true
 material = SubResource("ShaderMaterial_lbvrf")
 tile_map_data = PackedByteArray("AAACAAAAAAABAAAAAAADAAAAAAABAAAAAAAEAAAAAAABAAAAAAAHAAAAAAABAAAAAAAIAAAAAAABAAAAAAAJAAAAAAABAAAAAAABAAAAAAABAAAAAAAFAAAAAAABAAAAAAAGAAAAAAABAAAAAAAKAAAAAAABAAAAAAAAAAMAAAABAAAAAAABAAMAAAABAAAAAAACAAMAAAABAAAAAAADAAMAAAABAAAAAAAEAAMAAAABAAAAAAAFAAMAAAABAAAAAAAGAAMAAAABAAAAAAAHAAMAAAABAAAAAAAIAAMAAAABAAAAAAAJAAMAAAABAAAAAAAKAAMAAAABAAAAAAA=")
 tile_set = SubResource("TileSet_cafgl")
+script = ExtResource("3_m256f")
+mesh_library = ExtResource("4_tqpdw")
 
 [node name="0" type="TileMapLayer" parent="Circle"]
 y_sort_enabled = true
 material = SubResource("ShaderMaterial_xarji")
 tile_map_data = PackedByteArray("AAACAP//AAABAAAAAAACAP7/AAAAAAEAAAACAP3/AAAAAAEAAAAEAP3/AAAAAAEAAAAEAP7/AAAAAAEAAAADAP7/AAAAAAEAAAADAP3/AAAAAAEAAAADAP//AAABAAAAAAAEAP//AAABAAAAAAAHAP3/AAAAAAEAAAAHAP7/AAAAAAEAAAAHAP//AAABAAAAAAAIAP//AAABAAAAAAAJAP//AAABAAAAAAAJAP7/AAAAAAEAAAAJAP3/AAAAAAEAAAAIAP3/AAAAAAEAAAAIAP7/AAAAAAEAAAABAP3/AAAAAAEAAAABAP7/AAAAAAEAAAABAP//AAAAAAEAAAAFAP//AAAAAAEAAAAFAP7/AAAAAAEAAAAFAP3/AAAAAAEAAAAGAP3/AAAAAAEAAAAGAP7/AAAAAAEAAAAGAP//AAAAAAEAAAAKAP//AAAAAAEAAAAKAP7/AAAAAAEAAAAKAP3/AAAAAAEAAAAAAAAAAAAAAAEAAAAAAAEAAAAAAAEAAAAAAAIAAAAAAAEAAAABAAAAAAAAAAEAAAABAAEAAAAAAAEAAAABAAIAAAAAAAEAAAACAAAAAAAAAAEAAAACAAEAAAAAAAEAAAACAAIAAAAAAAEAAAADAAAAAAAAAAEAAAADAAEAAAAAAAEAAAADAAIAAAAAAAEAAAAEAAAAAAAAAAEAAAAEAAEAAAAAAAEAAAAEAAIAAAAAAAEAAAAFAAAAAAAAAAEAAAAFAAEAAAAAAAEAAAAFAAIAAAAAAAEAAAAGAAAAAAAAAAEAAAAGAAEAAAAAAAEAAAAGAAIAAAAAAAEAAAAHAAAAAAAAAAEAAAAHAAEAAAAAAAEAAAAHAAIAAAABAAAAAAAIAAAAAAAAAAEAAAAIAAEAAAAAAAEAAAAIAAIAAAABAAAAAAAJAAAAAAAAAAEAAAAJAAEAAAAAAAEAAAAJAAIAAAABAAAAAAAKAAAAAAAAAAEAAAAKAAEAAAAAAAEAAAAKAAIAAAAAAAEAAAA=")
 tile_set = SubResource("TileSet_cafgl")
+script = ExtResource("3_m256f")
+mesh_library = ExtResource("4_tqpdw")
 
 [node name="1" type="TileMapLayer" parent="Circle"]
 z_index = 10
@@ -197,17 +201,21 @@ y_sort_enabled = true
 material = SubResource("ShaderMaterial_57b5b")
 tile_map_data = PackedByteArray("AAACAP7/AAABAAAAAAADAP7/AAABAAAAAAAEAP7/AAABAAAAAAAHAP7/AAABAAAAAAAIAP7/AAABAAAAAAAJAP7/AAABAAAAAAAHAAEAAAABAAAAAAAIAAEAAAABAAAAAAAJAAEAAAABAAAAAAA=")
 tile_set = SubResource("TileSet_cafgl")
+script = ExtResource("3_m256f")
+mesh_library = ExtResource("4_tqpdw")
 
 [node name="2" type="TileMapLayer" parent="Circle"]
 z_index = 20
 material = SubResource("ShaderMaterial_p2xtl")
 tile_map_data = PackedByteArray("AAACAP3/AAAAAAAAAAADAP3/AAAAAAAAAAAEAP3/AAAAAAAAAAAHAP3/AAAAAAAAAAAIAP3/AAAAAAAAAAAJAP3/AAAAAAAAAAAHAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAA=")
 tile_set = SubResource("TileSet_cafgl")
+script = ExtResource("3_m256f")
+mesh_library = ExtResource("4_tqpdw")
 
-[node name="StaticDaicon_2" parent="." instance=ExtResource("7_jtpl2")]
+[node name="StaticBodyDaicon_2" parent="." instance=ExtResource("7_jtpl2")]
 position = Vector2(56, -32)
 
-[node name="StaticDaicon_1" parent="." instance=ExtResource("7_jtpl2")]
+[node name="StaticBodyDaicon_1" parent="." instance=ExtResource("7_jtpl2")]
 position = Vector2(-56, -32)
 
 [node name="Player" parent="." instance=ExtResource("8_lbvrf")]

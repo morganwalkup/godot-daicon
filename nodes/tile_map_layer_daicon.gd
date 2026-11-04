@@ -1,16 +1,26 @@
 @tool
 @icon("res://addons/daicon/icons/daicon_map_layer.svg")
-class_name DaiconMapLayer extends TileMapLayer
-## A TileMapLayer that builds its own 3D collision.
-## Use it alone (not under a DaiconMap). The height level is z_index / z_step,
-## unless level_from_z_index is off. Then it is "level", and z_index only sets the draw order.
+class_name TileMapLayerDaicon extends TileMapLayer
+## A TileMapLayer that also builds 3D collision: GridMap blocks from the "Item" custom data, and
+## (with extrude_physics) 3D walls from the 2D physics polygons. The whole native TileMapLayer API
+## stays the same. The height level is z_index / z_step, unless level_from_z_index is off.
+## Then it is "level", and z_index only sets the draw order.
+##
+## A collision with the GridMap or the extrusion maps to this node through
+## CollisionObjectDaicon.from_3d(), so gameplay code can test `collider is TileMapLayerDaicon`.
+## collision_layer and collision_mask are 3D layers (the GridMap names). The 2D tile physics is
+## off at runtime while disable_2d_collision is on.
+##
+## Not mirrored: get_coords_for_body_rid() takes only 2D RIDs (a native method cannot be overridden).
 
+## The GridMap of the blocks. Read-only. See get_grid_map().
 var grid_map : GridMap
+## The StaticBody3D of the extruded walls. Read-only. See get_extrusion().
 var extrusion : StaticBody3D
 var _dirty := true
 var _built_level := 0
 
-#region DaiconMapLayer Exports
+#region TileMapLayerDaicon Exports
 
 @export var mesh_library : MeshLibrary:
 	set(library):
@@ -92,7 +102,7 @@ var _built_level := 0
 @export_flags_3d_physics var extrusion_layer: int = 0:
 	set(value):
 		extrusion_layer = value
-		if extrusion: extrusion.collision_layer = value if value != 0 else layer
+		if extrusion: extrusion.collision_layer = value if value != 0 else collision_layer
 	get():
 		return extrusion_layer
 ## If on, the 2D physics of this layer is turned off, so only the 3D walls collide.
@@ -104,20 +114,18 @@ var _built_level := 0
 		return disable_2d_collision
 
 @export_group("Collision")
-@export_flags_3d_physics var layer: int = 1:
-	set(collision_layer):
-		if grid_map: grid_map.collision_layer = collision_layer
-		if extrusion and extrusion_layer == 0: extrusion.collision_layer = collision_layer
-		layer = collision_layer
-	get():
-		return layer
-@export_flags_3d_physics var mask: int = 1:
-	set(collision_mask):
-		if grid_map: grid_map.collision_mask = collision_mask
-		if extrusion: extrusion.collision_mask = collision_mask
-		mask = collision_mask
-	get():
-		return mask
+## 3D layers of the GridMap blocks (and of the walls while extrusion_layer is 0).
+@export_flags_3d_physics var collision_layer: int = 1:
+	set(value):
+		if grid_map: grid_map.collision_layer = value
+		if extrusion and extrusion_layer == 0: extrusion.collision_layer = value
+		collision_layer = value
+## 3D layers that the GridMap blocks and the walls collide with.
+@export_flags_3d_physics var collision_mask: int = 1:
+	set(value):
+		if grid_map: grid_map.collision_mask = value
+		if extrusion: extrusion.collision_mask = value
+		collision_mask = value
 @export_group("Navigation")
 @export var bake_navigation: bool = false:
 	set(value):
@@ -159,8 +167,9 @@ func _ready() -> void:
 	grid_map.mesh_library = mesh_library
 	grid_map.physics_material = physics_material
 	grid_map.cell_size = size
-	grid_map.collision_layer = layer
-	grid_map.collision_mask = mask
+	grid_map.collision_layer = collision_layer
+	grid_map.collision_mask = collision_mask
+	grid_map.set_meta(CollisionObjectDaicon.OWNER_META, self)
 	grid_map.bake_navigation = bake_navigation
 	grid_map.visible = visible_3d
 	
@@ -169,8 +178,9 @@ func _ready() -> void:
 	
 	extrusion = StaticBody3D.new()
 	extrusion.set_name(DaiconMapBuilder.EXTRUSION_NAME)
-	extrusion.collision_layer = extrusion_layer if extrusion_layer != 0 else layer
-	extrusion.collision_mask = mask
+	extrusion.collision_layer = extrusion_layer if extrusion_layer != 0 else collision_layer
+	extrusion.collision_mask = collision_mask
+	extrusion.set_meta(CollisionObjectDaicon.OWNER_META, self)
 	extrusion.physics_material_override = physics_material
 	add_child(extrusion)
 	move_child(extrusion, 1)
@@ -183,6 +193,16 @@ func _process(_delta: float) -> void:
 	_sync_origin()
 	if _built_level != get_level(): _dirty = true
 	if _dirty: update_grid_map()
+
+## The GridMap of the blocks, for NavigationRegionDaicon and checks.
+func get_grid_map() -> GridMap:
+	return grid_map
+
+
+## The StaticBody3D of the extruded walls, for NavigationRegionDaicon and checks.
+func get_extrusion() -> StaticBody3D:
+	return extrusion
+
 
 ## Returns the height level of this layer.
 func get_level() -> int:

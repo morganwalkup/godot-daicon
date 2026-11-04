@@ -1,47 +1,43 @@
 @tool
-extends KinematicDaicon
+extends CharacterBodyDaicon
+## The example player. The arrow keys move it on the ground plane; ui_accept jumps.
 
-const SPEED = 5
-const JUMP_VELOCITY = 5
-const gravity = 10
-const acceleration = 20
-@onready var animation_tree : AnimationTree = $AnimationTree
-@onready var animation = animation_tree.get("parameters/playback")
+const SPEED: float = 80.0 # px/s on the ground plane
+const ACCELERATION: float = 320.0 # px/s²
+const JUMP_VELOCITY: float = 5.0 # blocks/s
 
-var movement_input := Vector2.ZERO
+@onready var animation_tree: AnimationTree = $AnimationTree
+@onready var animation: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
+
+
+func _init() -> void:
+	use_gravity = true
+	gravity_3d = 10.0
+
 
 func _physics_process(delta: float) -> void:
-	if not Engine.is_editor_hint():
-		var body := core as CharacterBody3D
-		movement_input = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-		var direction := Vector3(movement_input.x, 0, movement_input.y).normalized()
-		if direction != Vector3.ZERO:
-			set_animation_direction(movement_input)
-		
-		var y_vel = body.velocity.y
-		body.velocity = body.velocity.move_toward(direction * SPEED, acceleration * delta)
-		body.velocity.y = y_vel - gravity * delta
-		
-		if Input.is_action_just_pressed("ui_accept") and body.is_on_floor():
-			body.velocity.y += JUMP_VELOCITY
-			
-		body.move_and_slide()
-		player_animation(direction, body.velocity)
-		update_pos()
+	if Engine.is_editor_hint():
+		return
+	var input := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	if input != Vector2.ZERO:
+		set_animation_direction(input)
+	velocity = velocity.move_toward(input.normalized() * SPEED, ACCELERATION * delta)
+	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+		jump(JUMP_VELOCITY)
+	move_and_slide()
+	player_animation(input)
 
-func player_animation(direction, velocity: Vector3):
-	var body := core as CharacterBody3D
-	if velocity == Vector3.ZERO:
+
+func player_animation(input: Vector2) -> void:
+	if velocity == Vector2.ZERO and is_on_floor():
 		animation.travel("Idle")
-	elif direction:
-		if body.is_on_floor():
-			animation.travel("Move")
-		else:
-			animation.travel("Jump")
-	elif not body.is_on_floor():
+	elif input != Vector2.ZERO:
+		animation.travel("Move" if is_on_floor() else "Jump")
+	elif not is_on_floor():
 		animation.travel("Jump Down")
 
-func set_animation_direction(direction):
+
+func set_animation_direction(direction: Vector2) -> void:
 	animation_tree.set("parameters/Idle/blend_position", direction)
 	animation_tree.set("parameters/Move/blend_position", direction)
 	animation_tree.set("parameters/Jump/blend_position", direction)

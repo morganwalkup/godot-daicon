@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://bo8sog8wpw4n4"]
+
+[ext_resource type="Script" uid="uid://r7imlxxd3hbv" path="res://addons/daicon/nodes/collision_shape_daicon.gd" id="cs_daicon"]
+[ext_resource type="Script" uid="uid://dyys8brvp0qxr" path="res://addons/daicon/nodes/entities/static_body_daicon.gd" id="1_kumnq"]
+[ext_resource type="Texture2D" uid="uid://1dtkll3jibsk" path="res://addons/daicon/examples/assets/basic.png" id="2_hf6pr"]
+[ext_resource type="Texture2D" uid="uid://rvj40e0hpbx3" path="res://addons/daicon/examples/assets/shadow.png" id="3_8l230"]
+[ext_resource type="Script" uid="uid://c4jpvau84mi7k" path="res://addons/daicon/nodes/daicon_shadow.gd" id="4_l47av"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2d8jv"]
+
+[node name="StaticBodyDaicon" type="Node2D"]
+z_index = 1
+y_sort_enabled = true
+script = ExtResource("1_kumnq")
+metadata/_custom_type_script = "uid://dyys8brvp0qxr"
+
+[node name="CollisionShapeDaicon" type="Node2D" parent="."]
+script = ExtResource("cs_daicon")
+shape = SubResource("BoxShape3D_2d8jv")
+offset_3d = Vector3(0, 0.5, 0)
+
+[node name="DaiconShadow" type="Sprite2D" parent="."]
+show_behind_parent = true
+z_index = 10
+z_as_relative = false
+y_sort_enabled = true
+position = Vector2(0, 8)
+texture = ExtResource("3_8l230")
+script = ExtResource("4_l47av")
+shadow_opacity = 1.0
+pivot_offset = Vector2(0, 8)
+metadata/_custom_type_script = "uid://c4jpvau84mi7k"
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(-1, -1)
+texture = ExtResource("2_hf6pr")
+offset = Vector2(0, -8)
+flip_h = true
+hframes = 10
+vframes = 16

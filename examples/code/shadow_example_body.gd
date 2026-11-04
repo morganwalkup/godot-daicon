@@ -1,26 +1,22 @@
 @tool
-extends KinematicDaicon
+extends CharacterBodyDaicon
+## A body for the shadow example. The arrow keys move it on the ground plane; ui_accept jumps.
 
-const SPEED = 5
-const JUMP_VELOCITY = 5
-const gravity = 10
-const acceleration = 20
+const SPEED: float = 80.0 # px/s on the ground plane
+const ACCELERATION: float = 320.0 # px/s²
+const JUMP_VELOCITY: float = 5.0 # blocks/s
 
-var movement_input := Vector2.ZERO
+
+func _init() -> void:
+	use_gravity = true
+	gravity_3d = 10.0
+
 
 func _physics_process(delta: float) -> void:
-	if not Engine.is_editor_hint():
-		var body := core as CharacterBody3D
-		if not body: return
-		
-		movement_input = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-		var direction := Vector3(movement_input.x, 0, movement_input.y).normalized()
-		
-		var y_vel = body.velocity.y
-		body.velocity = body.velocity.move_toward(direction * SPEED, acceleration * delta)
-		body.velocity.y = y_vel - gravity * delta
-		
-		if Input.is_action_just_pressed("ui_accept") and body.is_on_floor(): body.velocity.y += JUMP_VELOCITY
-		
-		body.move_and_slide()
-		update_pos()
+	if Engine.is_editor_hint():
+		return
+	var input := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	velocity = velocity.move_toward(input.normalized() * SPEED, ACCELERATION * delta)
+	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+		jump(JUMP_VELOCITY)
+	move_and_slide()

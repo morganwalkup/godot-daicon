@@ -1,29 +1,36 @@
 extends Daicon
 
+## Toward the camera: a point at (x, y + 1, z + 1) draws at the same 2D position as (x, y, z).
+const VIEW_RAY := Vector3(0, 5, 5)
+const RAY_START_HEIGHT: float = 0.5
+
 var position_array: Array[Vector2] = []
 
-func _ready() -> void:
-	super._ready()
 
 func _physics_process(_delta: float) -> void:
-	shader_target_nodes.sort_custom(func(a, b): return a.z_index < b.z_index)
-	shader_trigger_nodes.sort_custom(func(a, b): return a.z_index < b.z_index)
-	
-	for shader_target in shader_target_nodes:
-		if not is_instance_valid(shader_target): continue
-		
-		var mat: ShaderMaterial = shader_target.material as ShaderMaterial
-		if not mat: continue
-		
+	shader_target_nodes.sort_custom(func(a: Node, b: Node) -> bool: return (a as CanvasItem).z_index < (b as CanvasItem).z_index)
+	shader_trigger_nodes.sort_custom(func(a: Node, b: Node) -> bool: return (a as CanvasItem).z_index < (b as CanvasItem).z_index)
+	for shader_target: Node in shader_target_nodes:
+		if not is_instance_valid(shader_target):
+			continue
+		var target := shader_target as CanvasItem
+		var mat := target.material as ShaderMaterial
+		if not mat:
+			continue
 		position_array.clear()
-		
-		for shader_trigger in shader_trigger_nodes:
-			if not is_instance_valid(shader_trigger): continue
-			
-			var cast = shader_trigger.shader_cast
-			if cast and cast.is_colliding() and shader_target.z_index >= shader_trigger.z_index:
-				var screen_pos: Vector2 = shader_trigger.get_global_transform_with_canvas().origin
-				position_array.append(screen_pos)
-		
+		for shader_trigger: Node in shader_trigger_nodes:
+			var trigger := shader_trigger as CollisionObjectDaicon
+			if not is_instance_valid(trigger):
+				continue
+			if target.z_index >= trigger.z_index and _is_hidden(trigger):
+				position_array.append(trigger.get_global_transform_with_canvas().origin)
 		mat.set_shader_parameter("CircleCentres", position_array)
 		mat.set_shader_parameter("NumCircleCentres", position_array.size())
+
+
+func _is_hidden(trigger: CollisionObjectDaicon) -> bool:
+	if not trigger.core or not trigger.core.is_inside_tree():
+		return false
+	var from := trigger.get_ground_position_3d() + Vector3(0, RAY_START_HEIGHT, 0)
+	var query := PhysicsRayQueryParameters3D.create(from, from + VIEW_RAY, 1, [trigger.get_rid_3d()])
+	return not trigger.core.get_world_3d().direct_space_state.intersect_ray(query).is_empty()
