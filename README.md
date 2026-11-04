@@ -139,10 +139,17 @@ A write to `position` or `global_position` at runtime moves the core there and k
 ### Bodies
 
 - `CharacterBodyDaicon` builds a capsule from `footprint_radius` and `body_height` when it has no `CollisionShapeDaicon` child. It builds a whisker (the draw-order area) when `whisker_reach` is above 0.
-- `StaticBodyDaicon` builds a box from `footprint_size` and `wall_height` when it has no `CollisionShapeDaicon` child. With `occluder_height` above 0, it also builds an occluder box. `navigation_obstacle` adds a `NavigationObstacle3D`. `get_navigation_footprint()` gives the box that `NavigationRegionDaicon` bakes.
+- `StaticBodyDaicon` builds a box from `footprint_size` and `wall_height` when it has no `CollisionShapeDaicon` child. With `occluder_height` above 0, it also builds an occluder box. `navigation_obstacle` adds a `NavigationObstacle3D`. `get_navigation_footprint()` gives the box that `NavigationRegionDaicon` bakes. The static `StaticBodyDaicon.navigation_footprint_of(body)` gives the same box and also works on a placeholder (see [Scripts without @tool](#scripts-without-tool)).
 - `AnimatableBodyDaicon` extends `StaticBodyDaicon`. Move it with `position` (a Tween or an AnimationPlayer track), and lift it with `height`. It is never baked into the navmesh.
 - `RigidBodyDaicon` re-emits `body_entered`, `body_exited`, and `sleeping_state_changed` with Daicon nodes.
 - `AreaDaicon` overlaps in 3D, so an area at another height does not overlap. Inside a Daicon body, its stored `height` is the height above that body.
+
+### Scripts without @tool
+
+Every Daicon class is `@tool`. A subclass script without `@tool` (for example a game prop) gets a placeholder script instance in the editor. A placeholder keeps its exported properties, but it has no `core`, and a call to one of its script methods is an error ("Attempt to call a method on a placeholder instance").
+
+- Editor code that uses another Daicon node must test `CollisionObjectDaicon.is_placeholder(node)` first, and then read only exported properties.
+- `NavigationRegionDaicon` reads the footprint of a placeholder body from its exported properties. A placeholder `TileMapLayerDaicon` builds no 3D geometry in the editor, so the region shows a warning and does not bake. Add `@tool` to that layer script.
 
 ### Shapes
 

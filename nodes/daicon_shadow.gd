@@ -82,7 +82,10 @@ func _process(_delta: float) -> void:
 #endregion
 
 #region Core Setup
-func _find_entity() -> void: parent_entity = CollisionObjectDaicon.find_parent_entity(self)
+func _find_entity() -> void:
+	var entity := CollisionObjectDaicon.find_parent_entity(self)
+	# A placeholder entity has no core in the editor (see CollisionObjectDaicon.is_placeholder()).
+	parent_entity = null if CollisionObjectDaicon.is_placeholder(entity) else entity
 
 func _inject_shapecast() -> void:
 	if not parent_entity or not parent_entity.core: return

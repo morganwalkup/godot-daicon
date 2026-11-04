@@ -61,7 +61,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 ## Puts the 3D shape under the parent's core. The parent calls it after it builds its core.
 func attach() -> void:
 	var parent := get_parent() as CollisionObjectDaicon
-	if not parent or not parent.core or not shape: return
+	if not parent or CollisionObjectDaicon.is_placeholder(parent) or not parent.core or not shape: return
 	if _shape_3d and is_instance_valid(_shape_3d): return
 	_shape_3d = parent.add_shape_3d(shape, _local_position(parent), role, name)
 	_shape_3d.disabled = disabled

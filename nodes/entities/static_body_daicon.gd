@@ -73,12 +73,21 @@ func set_obstacle_enabled(enabled: bool) -> void:
 ## The solid box that NavigationRegionDaicon bakes, in 3D global blocks. Empty for a navigation
 ## obstacle or a body with no footprint. It reads the 2D position, so it also works in the editor.
 func get_navigation_footprint() -> AABB:
-	if navigation_obstacle or not _has_footprint():
+	return navigation_footprint_of(self)
+
+
+## get_navigation_footprint() of a body. It reads only exported properties and the native position,
+## so it also works on a placeholder in the editor (see is_placeholder()), for example a subclass
+## without @tool.
+static func navigation_footprint_of(body: StaticBodyDaicon) -> AABB:
+	var size_px: Vector2 = body.footprint_size
+	if body.navigation_obstacle or size_px.x <= 0.0 or size_px.y <= 0.0:
 		return AABB()
-	var h: float = get_height()
-	var drawn := _get_position_2d()
-	var feet := Vector3(drawn.x / tile_size, h, drawn.y / tile_size + h)
-	var size := Vector3(footprint_size.x / tile_size, wall_height, footprint_size.y / tile_size)
+	var ts: float = body.tile_size
+	var h: float = body.height
+	var drawn: Vector2 = body.global_position if body.is_inside_tree() else body.position
+	var feet := Vector3(drawn.x / ts, h, drawn.y / ts + h)
+	var size := Vector3(size_px.x / ts, body.wall_height, size_px.y / ts)
 	return AABB(feet - Vector3(size.x / 2.0, 0.0, size.z / 2.0), size)
 
 

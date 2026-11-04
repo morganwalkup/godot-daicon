@@ -85,7 +85,7 @@ func _ready() -> void:
 	z_index = 1
 	_init_core()
 	for child: Node in get_children():
-		if child is CollisionShapeDaicon: (child as CollisionShapeDaicon).attach()
+		if child is CollisionShapeDaicon and not is_placeholder(child): (child as CollisionShapeDaicon).attach()
 	core.set_meta("z_index", z_index)
 	if not Engine.is_editor_hint():
 		_last_synced = _get_position_2d()
@@ -156,6 +156,16 @@ static func from_3d(node: Object) -> Object:
 	return node
 
 
+## True in the editor for a node whose script is not @tool, for example a Daicon subclass without
+## @tool. The editor gives such a node a placeholder script instance: its exported properties can
+## be read, but a call to a script method or a read of a non-exported member is an error.
+## Editor (@tool) code must check this before it uses another Daicon node.
+static func is_placeholder(node: Object) -> bool:
+	if not Engine.is_editor_hint() or not node: return false
+	var script := node.get_script() as Script
+	return script != null and not script.is_tool()
+
+
 func _set_bit(bits: int, layer_number: int, value: bool) -> int:
 	var bit := 1 << (layer_number - 1)
 	return (bits | bit) if value else (bits & ~bit)
@@ -219,7 +229,8 @@ static func same_level_areas(area: Node) -> Array:
 static func height_of(node: Node) -> float:
 	var curr: Node = node
 	while curr:
-		if curr is CollisionObjectDaicon: return (curr as CollisionObjectDaicon).get_height()
+		# The property, not get_height(): a placeholder (see is_placeholder()) has only properties.
+		if curr is CollisionObjectDaicon: return (curr as CollisionObjectDaicon).height
 		curr = curr.get_parent()
 	return 0.0
 

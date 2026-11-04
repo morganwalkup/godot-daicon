@@ -44,6 +44,7 @@ const POLL_SECONDS: float = 2.0
 
 var _poll: float = 0.0
 var _stale: bool = false
+var _placeholder_count: int = 0
 
 
 func _ready() -> void:
@@ -59,15 +60,20 @@ func _process(delta: float) -> void:
 	if _poll < POLL_SECONDS:
 		return
 	_poll = 0.0
-	var stale := is_stale()
-	if stale != _stale:
+	var placeholders := _placeholder_layers().size()
+	var stale := placeholders == 0 and is_stale()
+	if stale != _stale or placeholders != _placeholder_count:
 		_stale = stale
+		_placeholder_count = placeholders
 		update_configuration_warnings()
 
 
 func _get_configuration_warnings() -> PackedStringArray:
 	if not get_parent() is Node2D:
 		return PackedStringArray(["NavigationRegionDaicon must be a child of the map's 2D root."])
+	var placeholders := _placeholder_layers()
+	if not placeholders.is_empty():
+		return PackedStringArray(["%s has a script without @tool, so it builds no 3D geometry in the editor. Add @tool to the script, or the bake and the stale check cannot read the layer." % placeholders[0].name])
 	if not navigation_mesh:
 		return PackedStringArray(["No navmesh. Press \"Bake navmesh\" in the inspector."])
 	if _stale:
@@ -77,6 +83,10 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 ## Bakes the navmesh from the map and saves it to navmesh_path(). Editor and check scripts only.
 func bake() -> void:
+	var placeholders := _placeholder_layers()
+	if not placeholders.is_empty():
+		push_error("NavigationRegionDaicon: not baked. %s has a script without @tool, so the editor cannot read its 3D geometry." % placeholders[0].get_path())
+		return
 	var start := Time.get_ticks_usec()
 	var path := navmesh_path()
 	var nm: NavigationMesh = navigation_mesh if navigation_mesh and navigation_mesh.resource_path == path else NavigationMesh.new()
@@ -168,13 +178,24 @@ func bake_aabb() -> AABB:
 	return box
 
 
+## The map layers that the bake reads. A placeholder layer (see _placeholder_layers()) is not one.
 func _map_layers() -> Array[TileMapLayerDaicon]:
+	return _find_layers(false)
+
+
+## The map layers with a script without @tool. In the editor they have a placeholder script
+## instance and build no GridMap or extrusion (see CollisionObjectDaicon.is_placeholder()).
+func _placeholder_layers() -> Array[TileMapLayerDaicon]:
+	return _find_layers(true)
+
+
+func _find_layers(placeholders: bool) -> Array[TileMapLayerDaicon]:
 	var layers: Array[TileMapLayerDaicon] = []
 	var parent := get_parent()
 	if not parent:
 		return layers
 	for node: Node in parent.find_children("*", "TileMapLayer", true, false):
-		if node is TileMapLayerDaicon:
+		if node is TileMapLayerDaicon and CollisionObjectDaicon.is_placeholder(node) == placeholders:
 			layers.append(node as TileMapLayerDaicon)
 	return layers
 
@@ -205,8 +226,10 @@ func _set_parameters(nm: NavigationMesh) -> void:
 
 ## A still body builds its footprint only at runtime, so the bake adds the same box here.
 ## add_faces() takes global space: the data already holds the inverse of this node's transform.
+## The static helper, not body.get_navigation_footprint(): in the editor the body can be a
+## placeholder (a subclass without @tool, for example a barrel), and a placeholder has no methods.
 func _add_footprint(data: NavigationMeshSourceGeometryData3D, body: StaticBodyDaicon) -> void:
-	var footprint := body.get_navigation_footprint()
+	var footprint := StaticBodyDaicon.navigation_footprint_of(body)
 	if not footprint.has_volume():
 		return
 	var box := BoxMesh.new()
