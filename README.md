@@ -4,11 +4,9 @@
 ![Godot](https://img.shields.io/badge/Godot-4.5%2B-478cbf.svg)
 ![Version](https://img.shields.io/badge/version-1.6-orange.svg)
 
-**World 2.5D** is a Godot plugin for creating 2.5D games. It is a fork of an MIT-licensed 2.5D plugin by Alkrei (see [LICENSE](LICENSE)).
+**World 2.5D** is a Godot plugin for creating 2.5D games. It is a fork of the MIT-licensed 2.5D [Daicon](https://github.com/arukurei/Daicon) plugin by Alkrei.
 
 Its principle is to use 3D space calculations and math to move 2D objects. In this way it simulates the 3D depth of an environment while staying in a 2D dimension. The addon provides a set of new nodes and additional tools that combine 2D and 3D capabilities simultaneously.
-
-https://github.com/user-attachments/assets/388bd1bf-629e-49e4-8d5c-f3ae23a412f4
 
 ## Why World 2.5D?
  
@@ -22,7 +20,7 @@ Simulating 3D depth for a 2D game usually means picking between two established,
 
 ## Features
 
-In this fork, each 2.5D node has the API of the Godot built-in 2D node with the same role. Code that you write for `CharacterBody2D` reads the same on `CharacterBody25D`, except for the breaks in [Where the API differs](#where-the-api-differs).
+Each 2.5D node has the API of the Godot built-in 2D node with the same role. Code that you write for `CharacterBody2D` reads the same on `CharacterBody25D`, except for the breaks in [Where the API differs](#where-the-api-differs).
 
 | 2.5D node | Built-in model | Hidden 3D node (`core`) |
 |---|---|---|
@@ -39,14 +37,10 @@ In this fork, each 2.5D node has the API of the Godot built-in 2D node with the 
 
 Other nodes:
 
-- `Root25D` — a root node with the shader trigger and target lists of the examples.
+- `Root25D` — a root node that turns y-sort on.
 - `Shadow25D` — a drop shadow for its nearest 2.5D ancestor. A `ShapeCast3D` under the core finds the floor below. `cast_radius` is in px. `max_distance` and `fade_start_distance` are heights, in blocks.
 - `KinematicCollision25D` — the collision result of `move_and_collide()` and `get_slide_collision()`.
-- Custom shaders (`circle`, `blur_circle`) for see-through effects.
-- Editor script templates for the body nodes.
 - Example scenes in `examples/` that use the body nodes, `TileMapLayer25D`, and `CollisionShape25D`.
-
-![NODES](https://github.com/user-attachments/assets/fd7c5759-a461-488b-a838-b340924e372b)
 
 ---
 
@@ -55,9 +49,6 @@ Other nodes:
 1. Download or clone this repository. The repository root is the addon.
 2. Put the repository at `addons/world_25d` in your own Godot project (copy it, or add it as a git submodule).
 3. In Godot, go to **Project → Project Settings → Plugins**, and enable **World 2.5D**.
-
-> [!NOTE]
-> The plugin ships with ready-made script templates in `addons/world_25d/script_templates`. Copy them into your project's own `script_templates` folder to have new 2.5D scripts pre-wired when you create them from the editor.
 
 > [!IMPORTANT]
 > Requires Godot **4.5+** with the Forward+ renderer. This fork is tested on Godot 4.7.
@@ -78,9 +69,6 @@ func _physics_process(_delta: float) -> void:
 ```
 
 3. Open `examples/example.tscn` for a working demo scene.
-
-> [!NOTE]
-> The upstream author's page ([alkrei.itch.io](https://alkrei.itch.io)) links the upstream docs. They describe the upstream API, not the built-in names of this fork.
 
 ---
 
@@ -162,37 +150,6 @@ A `CollisionShape25D` child adds its `Shape3D` to the core of its parent. `offse
 ### Navigation
 
 `NavigationRegion25D` bakes in the editor from the `TileMapLayer25D` nodes and the still `StaticBody25D` nodes under its parent. It saves `<scene>_nav.tres` next to the scene. The bake settings (`agent_*`, `cell_*`, `border_size`, `geometry_collision_mask`) are exports.
-
----
-
-## Changes in this fork
-
-This fork is used by Kinsprit. It differs from the upstream plugin:
-
-- The node classes, scripts, icons, and the addon folder use the `25D` names, and the node classes have the API of the Godot built-in 2D nodes (see [Features](#features)). The upstream class names are gone, with no aliases, and the legacy `TileMap` class is deleted. In Kinsprit, `tools/migrations/migrate_25d.py` rewrites the old names in stored scenes and resources.
-- The slot system (`*_properties` dictionaries) is deleted. `CollisionShape25D` children and code-built default shapes replace it.
-- The repository root is the addon, so it mounts at `addons/world_25d`. `blocks.blend` and `blocks.tscn` are in `mesh/source/` behind a `.gdignore`, so a project imports `mesh/blocks.tres` without Blender.
-- 2.5D nodes and the map GridMaps use global 2D positions. Maps and bodies under an offset parent collide in the correct place.
-- The TileSet `Item` custom data layer can be a String (a MeshLibrary item name). An empty value means no block. Int layers still work.
-- Maps rebuild when cells change, and when `level` or `z_step` changes.
-- `extrude_physics` turns the 2D tile physics polygons into 3D walls on `extrusion_layer`. `disable_2d_collision` (on by default) turns off the 2D physics of the layer at runtime.
-- The whisker uses the lowest z of all overlapping occluders and skips the body's own core.
-- `TileMapBuilder25D` holds the map build code of `TileMapLayer25D`.
-- The body scripts are in `nodes/bodies/` (once `nodes/entities/`). `TileMapLayer25D.cell_size_3d` was `size`. `Shadow25D.cast_radius` (px) was `footprint_radius` (blocks): multiply an old value by `tile_size`. In Kinsprit, `tools/migrations/migrate_25d.py v2` rewrites stored scenes.
-
----
-
-## Upstream author
-
-The upstream plugin is by Alkrei.
-
-- [ItchIO](https://alkrei.itch.io)
-- [Bluesky](https://bsky.app/profile/arukurei.bsky.social)
-- [Telegram](https://t.me/G_Quasar)
-- [YouTube](https://www.youtube.com/@arukurei)
-- [Discord](https://discord.gg/663eYk5ZGA)
-
-To support the upstream author, donate via [PayPal](https://www.paypal.com/donate/?hosted_button_id=LF5SHGQDXK2PG) or [ItchIO](https://alkrei.itch.io).
 
 ---
 
