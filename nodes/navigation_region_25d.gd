@@ -21,6 +21,12 @@ const POLL_SECONDS: float = 2.0
 ## Adds a walkable floor at height 0 over the bake area (a WorldBoundaryShape3D ground cannot be
 ## read by the baker).
 @export var bake_ground: bool = true
+## Lowest floor level that the bake reads. The bake area starts 1 block below it, at the bottom
+## of the block under that floor.
+@export var min_level: int = 0
+## Highest floor level that the bake reads. The bake area ends 1 block above it, so an agent on
+## that floor has head room.
+@export var max_level: int = 8
 ## How many pixels are 1 block.
 @export var tile_size: int = 16
 
@@ -163,9 +169,12 @@ func collect_source_geometry(nm: NavigationMesh) -> NavigationMeshSourceGeometry
 
 
 ## The bake area in this node's space, from `bounds` or from the TileMapLayer25D cells.
+## Vertically it covers min_level - 1 to max_level + 1.
 func bake_aabb() -> AABB:
+	var bottom := float(min_level - 1)
+	var tall := float(maxi(max_level, min_level) - min_level + 2)
 	if bounds.has_area():
-		return AABB(Vector3(bounds.position.x, -1.0, bounds.position.y), Vector3(bounds.size.x, 10.0, bounds.size.y))
+		return AABB(Vector3(bounds.position.x, bottom, bounds.position.y), Vector3(bounds.size.x, tall, bounds.size.y))
 	var box := AABB()
 	var first := true
 	for layer: TileMapLayer25D in _map_layers():
@@ -174,7 +183,7 @@ func bake_aabb() -> AABB:
 			continue
 		var level: int = layer.get_level()
 		var origin: Vector3 = to_local(TileMapBuilder25D.origin_3d(layer, layer.tile_set.tile_size, layer.cell_offset))
-		var cells := AABB(origin + Vector3(rect.position.x, -1.0, rect.position.y + level), Vector3(rect.size.x, 10.0, rect.size.y))
+		var cells := AABB(origin + Vector3(rect.position.x, bottom, rect.position.y + level), Vector3(rect.size.x, tall, rect.size.y))
 		box = cells if first else box.merge(cells)
 		first = false
 	return box
