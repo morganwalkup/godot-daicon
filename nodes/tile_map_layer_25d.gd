@@ -56,10 +56,11 @@ var _built_level := 0
 		_dirty = true
 
 @export_group("Cell")
-@export_custom(PROPERTY_HINT_NONE, "suffix:blocks") var size: Vector3 = Vector3(1, 1, 1):
+## Size of one GridMap cell, in blocks (GridMap.cell_size).
+@export_custom(PROPERTY_HINT_NONE, "suffix:blocks") var cell_size_3d: Vector3 = Vector3(1, 1, 1):
 	set(v_3):
 		if grid_map: grid_map.cell_size = v_3
-		size = v_3
+		cell_size_3d = v_3
 ## Offset of the 3D cells from the 2D tiles. The upstream plugin uses (0, 0, -0.5).
 ## Use (0, 0, 0) to put a tile's top face exactly on the tile drawn in 2D.
 @export_custom(PROPERTY_HINT_NONE, "suffix:blocks") var cell_offset: Vector3 = Vector3(0, 0, -0.5):
@@ -135,7 +136,7 @@ func _ready() -> void:
 	
 	grid_map.mesh_library = mesh_library
 	grid_map.physics_material = physics_material
-	grid_map.cell_size = size
+	grid_map.cell_size = cell_size_3d
 	grid_map.collision_layer = collision_layer
 	grid_map.collision_mask = collision_mask
 	grid_map.set_meta(CollisionObject25D.OWNER_META, self)

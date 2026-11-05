@@ -7,11 +7,11 @@ class_name Shadow25D extends Sprite2D
 
 const SHAPE_NAME := "ShadowShapeCast"
 
-## Radius of the cast cylinder, in blocks.
-@export_range(0.05, 2.0, 0.05, "suffix:blocks") var footprint_radius: float = 0.35:
+## Radius of the cylinder that finds the floor, in px on the ground plane.
+@export_range(0.5, 32.0, 0.1, "suffix:px") var cast_radius: float = 5.6:
 	set(value):
-		footprint_radius = value
-		if shape_cast and shape_cast.shape is CylinderShape3D: (shape_cast.shape as CylinderShape3D).radius = value
+		cast_radius = value
+		if shape_cast and shape_cast.shape is CylinderShape3D: (shape_cast.shape as CylinderShape3D).radius = _cast_radius_blocks()
 ## Opacity of the shadow at or below fade_start_distance.
 @export_range(0.0, 1.0, 0.05) var shadow_opacity: float = 0.6:
 	set(value):
@@ -100,7 +100,7 @@ func _add_shape_cast() -> void:
 		shape_cast = ShapeCast3D.new()
 		shape_cast.name = SHAPE_NAME
 		var cylinder := CylinderShape3D.new()
-		cylinder.radius = footprint_radius
+		cylinder.radius = _cast_radius_blocks()
 		cylinder.height = 0.1
 		shape_cast.shape = cylinder
 		parent_25d.core.add_child(shape_cast, true)
@@ -164,6 +164,10 @@ func _update_debug_overlay() -> void:
 func _on_debug_draw() -> void:
 	if not parent_25d: return
 	_debug_layer.draw_line(to_local(parent_25d.global_position), Vector2.ZERO, Color(1, 0, 0.4, 0.9), 2.0)
-	var pixel_radius := footprint_radius * float(parent_25d.tile_size)
-	_debug_layer.draw_arc(Vector2.ZERO, pixel_radius, 0.0, TAU, 24, Color(debug_color, 0.8), 1.5)
+	_debug_layer.draw_arc(Vector2.ZERO, cast_radius, 0.0, TAU, 24, Color(debug_color, 0.8), 1.5)
 	_debug_layer.draw_circle(Vector2.ZERO, 3.0, debug_color)
+
+
+func _cast_radius_blocks() -> float:
+	var tile: float = float(parent_25d.tile_size) if parent_25d else 16.0
+	return cast_radius / tile

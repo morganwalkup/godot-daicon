@@ -40,7 +40,7 @@ In this fork, each 2.5D node has the API of the Godot built-in 2D node with the 
 Other nodes:
 
 - `Root25D` — a root node with the shader trigger and target lists of the examples.
-- `Shadow25D` — a drop shadow for its nearest 2.5D ancestor. A `ShapeCast3D` under the core finds the floor below. `footprint_radius`, `max_distance`, and `fade_start_distance` are in blocks.
+- `Shadow25D` — a drop shadow for its nearest 2.5D ancestor. A `ShapeCast3D` under the core finds the floor below. `cast_radius` is in px. `max_distance` and `fade_start_distance` are heights, in blocks.
 - `KinematicCollision25D` — the collision result of `move_and_collide()` and `get_slide_collision()`.
 - Custom shaders (`circle`, `blur_circle`) for see-through effects.
 - Editor script templates for the body nodes.
@@ -95,7 +95,8 @@ One rule applies to every 2.5D node. 1 block = 1 tile = `tile_size` px (16 by de
 | `height` | blocks | The 3D Y of the feet. The `core` origin is at the feet. |
 | `velocity`, `linear_velocity`, `constant_linear_velocity` | px/s | On the ground plane: x = east, y = south. Not the drawn screen velocity. |
 | `vertical_velocity`, `constant_vertical_velocity` | blocks/s | Up is positive. |
-| `safe_margin`, `floor_snap_length`, `footprint_size`, `footprint_radius` | px | Converted to blocks for the core. `Shadow25D.footprint_radius` is in blocks. |
+| `safe_margin`, `floor_snap_length`, `footprint_size`, `footprint_radius`, `cast_radius` | px | Converted to blocks for the core. |
+| `body_height`, `wall_height`, `occluder_height`, `area_height`, `whisker_reach`, `max_distance` | blocks | Heights and vertical reaches. |
 | `collision_layer`, `collision_mask` | 3D layer bits | Forwarded to the core. |
 
 A write to `position` or `global_position` at runtime moves the core there and keeps the height, as a write moves a built-in body. Use `teleport(position, height)` to set a height as well.
@@ -177,6 +178,7 @@ This fork is used by Kinsprit. It differs from the upstream plugin:
 - `extrude_physics` turns the 2D tile physics polygons into 3D walls on `extrusion_layer`. `disable_2d_collision` (on by default) turns off the 2D physics of the layer at runtime.
 - The whisker uses the lowest z of all overlapping occluders and skips the body's own core.
 - `TileMapBuilder25D` holds the map build code of `TileMapLayer25D`.
+- The body scripts are in `nodes/bodies/` (once `nodes/entities/`). `TileMapLayer25D.cell_size_3d` was `size`. `Shadow25D.cast_radius` (px) was `footprint_radius` (blocks): multiply an old value by `tile_size`. In Kinsprit, `tools/migrations/migrate_25d.py v2` rewrites stored scenes.
 
 ---
 

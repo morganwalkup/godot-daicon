@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bo8sog8wpw4n4"]
 
 [ext_resource type="Script" uid="uid://r7imlxxd3hbv" path="res://addons/world_25d/nodes/collision_shape_25d.gd" id="cs_25d"]
-[ext_resource type="Script" uid="uid://dyys8brvp0qxr" path="res://addons/world_25d/nodes/entities/static_body_25d.gd" id="1_kumnq"]
+[ext_resource type="Script" uid="uid://dyys8brvp0qxr" path="res://addons/world_25d/nodes/bodies/static_body_25d.gd" id="1_kumnq"]
 [ext_resource type="Texture2D" uid="uid://1dtkll3jibsk" path="res://addons/world_25d/examples/assets/basic.png" id="2_hf6pr"]
 [ext_resource type="Texture2D" uid="uid://rvj40e0hpbx3" path="res://addons/world_25d/examples/assets/shadow.png" id="3_8l230"]
 [ext_resource type="Script" uid="uid://c4jpvau84mi7k" path="res://addons/world_25d/nodes/shadow_25d.gd" id="4_l47av"]
