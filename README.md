@@ -40,7 +40,7 @@ In this fork, each 2.5D node has the API of the Godot built-in 2D node with the 
 Other nodes:
 
 - `Root25D` — a root node with the shader trigger and target lists of the examples.
-- `Shadow25D` — drop shadows for 2.5D objects.
+- `Shadow25D` — a drop shadow for its nearest 2.5D ancestor. A `ShapeCast3D` under the core finds the floor below. `footprint_radius`, `max_distance`, and `fade_start_distance` are in blocks.
 - `KinematicCollision25D` — the collision result of `move_and_collide()` and `get_slide_collision()`.
 - Custom shaders (`circle`, `blur_circle`) for see-through effects.
 - Editor script templates for the body nodes.
@@ -95,7 +95,7 @@ One rule applies to every 2.5D node. 1 block = 1 tile = `tile_size` px (16 by de
 | `height` | blocks | The 3D Y of the feet. The `core` origin is at the feet. |
 | `velocity`, `linear_velocity`, `constant_linear_velocity` | px/s | On the ground plane: x = east, y = south. Not the drawn screen velocity. |
 | `vertical_velocity`, `constant_vertical_velocity` | blocks/s | Up is positive. |
-| `safe_margin`, `floor_snap_length`, `footprint_size`, `footprint_radius` | px | Converted to blocks for the core. |
+| `safe_margin`, `floor_snap_length`, `footprint_size`, `footprint_radius` | px | Converted to blocks for the core. `Shadow25D.footprint_radius` is in blocks. |
 | `collision_layer`, `collision_mask` | 3D layer bits | Forwarded to the core. |
 
 A write to `position` or `global_position` at runtime moves the core there and keeps the height, as a write moves a built-in body. Use `teleport(position, height)` to set a height as well.
@@ -140,7 +140,7 @@ A write to `position` or `global_position` at runtime moves the core there and k
 - `CharacterBody25D` bodies do not push each other: a body with a small `safe_margin` is a solid wall to another body. To push, call `push_slide_colliders(push_speed, layer_mask)` after `move_and_slide()`. It calls `push(motion)` on each `CharacterBody25D` that the move ran into, if that body is on `layer_mask`, at the same level, and the requested velocity points into it. `push()` slides the body along walls and ramps, does nothing in the air, and undoes a move that leaves no floor under the body (a ledge).
 - `StaticBody25D` builds a box from `footprint_size` and `wall_height` when it has no `CollisionShape25D` child. With `occluder_height` above 0, it also builds an occluder box. `navigation_obstacle` adds a `NavigationObstacle3D`. `get_navigation_footprint()` gives the box that `NavigationRegion25D` bakes. The static `StaticBody25D.navigation_footprint_of(body)` gives the same box and also works on a placeholder (see [Scripts without @tool](#scripts-without-tool)).
 - `AnimatableBody25D` extends `StaticBody25D`. Move it with `position` (a Tween or an AnimationPlayer track), and lift it with `height`. It is never baked into the navmesh.
-- `RigidBody25D` re-emits `body_entered`, `body_exited`, and `sleeping_state_changed` with 2.5D nodes.
+- `RigidBody25D` re-emits `body_entered`, `body_exited`, `body_shape_entered`, `body_shape_exited`, and `sleeping_state_changed` with 2.5D nodes.
 - `Area25D` overlaps in 3D, so an area at another height does not overlap. Inside a 2.5D body, its stored `height` is the height above that body.
 
 ### Scripts without @tool

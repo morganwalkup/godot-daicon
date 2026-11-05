@@ -39,7 +39,7 @@ var _last_synced: Vector2 = Vector2(INF, INF)
 		height = value
 		if core:
 			core.position.y = value
-			_sync_from_core()
+			update_pos()
 	get():
 		return core.position.y if core else height
 
@@ -80,7 +80,6 @@ var _last_synced: Vector2 = Vector2(INF, INF)
 
 
 func _ready() -> void:
-	if tile_size <= 0: tile_size = 16
 	set_y_sort_enabled(true)
 	z_index = 1
 	_init_core()
@@ -107,23 +106,16 @@ func _apply_position_write() -> void:
 	var written := global_position
 	if written.is_equal_approx(_last_synced):
 		return
-	var h: float = core.position.y
-	core.position = Vector3(written.x / tile_size, h, written.y / tile_size + h)
-	_sync_from_core()
+	core.position = _unproject(written, core.position.y)
+	update_pos()
 
 
 func _process(_delta: float) -> void:
 	if Engine.is_editor_hint():
 		if not core: _init_core()
 		var position_2d := _get_position_2d()
-		var core_2d := _project(core.position)
-		if not position_2d.is_equal_approx(core_2d):
-			core.position.x = position_2d.x / tile_size
-			core.position.z = position_2d.y / tile_size + core.position.y
-
-
-func _validate_property(_property: Dictionary) -> void:
-	pass
+		if not position_2d.is_equal_approx(_project(core.position)):
+			core.position = _unproject(position_2d, core.position.y)
 
 
 #region Collision API
@@ -203,13 +195,8 @@ func teleport(position_2d: Vector2, new_height: float = NAN) -> void:
 		_set_position_2d(position_2d)
 		height = h
 		return
-	core.position = Vector3(position_2d.x / tile_size, h, position_2d.y / tile_size + h)
-	_sync_from_core()
-
-
-## True if this node and another node are near the same height. See height_of().
-func is_same_level(other: Node) -> bool:
-	return same_level(self, other)
+	core.position = _unproject(position_2d, h)
+	update_pos()
 
 
 ## True if two nodes (for example a hitbox and a hurtbox) are near the same height. See height_of().
@@ -236,7 +223,7 @@ static func height_of(node: Node) -> float:
 
 
 ## Walks up the parent chain and returns the first 2.5D ancestor, or null.
-static func find_parent_entity(node: Node) -> CollisionObject25D:
+static func find_parent_25d(node: Node) -> CollisionObject25D:
 	var curr: Node = node.get_parent()
 	while curr:
 		if curr is CollisionObject25D: return curr as CollisionObject25D
@@ -247,14 +234,13 @@ static func find_parent_entity(node: Node) -> CollisionObject25D:
 
 #region Draw order
 ## Writes the 2D position from the core and sets z_index with the whisker.
-func update_pos(coef: float = 0.0) -> void:
-	if coef == 0.0: coef = z_sort_coef
+func update_pos() -> void:
 	_set_position_2d(_project(core.position))
 	var h: float = core.position.y
 	var bodies: Array[Node3D] = whisker.get_overlapping_bodies() if whisker else ([] as Array[Node3D])
 	if not bodies.is_empty():
 		# The lowest z of all occluders wins, so the node draws under every one of them.
-		var lowest := z_index_for_height(h, coef)
+		var lowest := z_index_for_height(h)
 		for body in bodies:
 			if body == core: continue
 			var occluder_z: int
@@ -265,15 +251,14 @@ func update_pos(coef: float = 0.0) -> void:
 			lowest = mini(lowest, occluder_z)
 		z_index = lowest
 	else:
-		z_index = z_index_for_height(h, coef)
+		z_index = z_index_for_height(h)
 	core.set_meta("z_index", z_index)
 	if _occluder: _occluder.set_meta("z_index", z_index)
 
 
 ## The z_index of a node that stands at a height (in blocks), with no occluder.
-func z_index_for_height(at_height: float, coef: float = 0.0) -> int:
-	if coef == 0.0: coef = z_sort_coef
-	return int((snappedf(at_height, 0.01) + coef) * z_step + 2)
+func z_index_for_height(at_height: float) -> int:
+	return int((snappedf(at_height, 0.01) + z_sort_coef) * z_step + 2)
 #endregion
 
 
@@ -318,6 +303,13 @@ func add_shape_3d(shape: Shape3D, local_position: Vector3, role: int = Collision
 	return node
 
 
+## Adds a box that stands on the feet, with a footprint in px and a height in blocks.
+func _add_box_shape(size_px: Vector2, box_height: float, role: int = CollisionShape25D.Role.COLLISION) -> void:
+	var box := BoxShape3D.new()
+	box.size = Vector3(size_px.x / tile_size, box_height, size_px.y / tile_size)
+	add_shape_3d(box, Vector3(0.0, box_height / 2.0, 0.0), role)
+
+
 ## True if the node has a CollisionShape25D child of a role.
 func has_shape_child(role: int = CollisionShape25D.Role.COLLISION) -> bool:
 	for child: Node in get_children():
@@ -343,18 +335,28 @@ func _init_core() -> void:
 	core.collision_priority = collision_priority
 	core.rotation = rotation_3d
 	# Before add_child: an AnimatableBody3D with sync_to_physics reverts a later write until the physics step.
-	core.position = Vector3(position_2d.x / tile_size, start_height, position_2d.y / tile_size + start_height)
+	core.position = _unproject(position_2d, start_height)
 	add_child(core)
 	move_child(core, 0)
-
-
-func _sync_from_core() -> void:
-	update_pos()
 
 
 ## The drawn 2D position of a 3D point, in px.
 func _project(point: Vector3) -> Vector2:
 	return Vector2(point.x, point.z - point.y) * tile_size
+
+
+## The 3D point, in blocks, at a height that draws at a 2D position. The inverse of _project().
+func _unproject(position_2d: Vector2, at_height: float) -> Vector3:
+	return Vector3(position_2d.x / tile_size, at_height, position_2d.y / tile_size + at_height)
+
+
+## The 2.5D owners of 3D bodies or areas (see from_3d()), one entry for each owner.
+func _owners(nodes: Array) -> Array[Node]:
+	var result: Array[Node] = []
+	for node: Node in nodes:
+		var owner_25d := from_3d(node) as Node
+		if owner_25d and not result.has(owner_25d): result.append(owner_25d)
+	return result
 
 
 func _get_position_2d() -> Vector2:

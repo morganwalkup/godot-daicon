@@ -50,10 +50,10 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 	if _has_footprint() and not has_shape_child(CollisionShape25D.Role.COLLISION):
-		add_shape_3d(_box(footprint_size, wall_height), Vector3(0.0, wall_height / 2.0, 0.0))
+		_add_box_shape(footprint_size, wall_height)
 	if occluder_height > 0.0 and not has_shape_child(CollisionShape25D.Role.OCCLUDER):
 		var size: Vector2 = occluder_size if occluder_size != Vector2.ZERO else footprint_size
-		add_shape_3d(_box(size, occluder_height), Vector3(0.0, occluder_height / 2.0, 0.0), CollisionShape25D.Role.OCCLUDER)
+		_add_box_shape(size, occluder_height, CollisionShape25D.Role.OCCLUDER)
 	if navigation_obstacle and _has_footprint():
 		_obstacle = NavigationObstacle3D.new()
 		_obstacle.name = "NavigationObstacle3D"
@@ -93,12 +93,6 @@ static func navigation_footprint_of(body: StaticBody25D) -> AABB:
 
 func _has_footprint() -> bool:
 	return footprint_size.x > 0.0 and footprint_size.y > 0.0
-
-
-func _box(size_px: Vector2, box_height: float) -> BoxShape3D:
-	var box := BoxShape3D.new()
-	box.size = Vector3(size_px.x / tile_size, box_height, size_px.y / tile_size)
-	return box
 
 
 func _apply_constant_velocity() -> void:

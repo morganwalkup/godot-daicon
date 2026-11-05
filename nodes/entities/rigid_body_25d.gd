@@ -167,12 +167,8 @@ func _physics_process(_delta: float) -> void:
 #region RigidBody2D API
 ## The 2.5D nodes (or raw 3D bodies) that touch the body. Needs contact_monitor.
 func get_colliding_bodies() -> Array[Node]:
-	var result: Array[Node] = []
-	if not core: return result
-	for other: Node3D in _rigid().get_colliding_bodies():
-		var owner_25d := from_3d(other) as Node
-		if owner_25d and not result.has(owner_25d): result.append(owner_25d)
-	return result
+	if not core: return [] as Array[Node]
+	return _owners(_rigid().get_colliding_bodies())
 
 
 func get_contact_count() -> int:

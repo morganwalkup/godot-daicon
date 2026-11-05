@@ -146,7 +146,7 @@ func move_and_slide() -> bool:
 func apply_floor_snap() -> void:
 	_apply_position_write()
 	_body().apply_floor_snap()
-	_sync_from_core()
+	update_pos()
 
 
 ## Adds one frame of gravity to vertical_velocity, as move_and_slide() does with use_gravity on.
@@ -270,7 +270,7 @@ func push(motion: Vector2) -> Vector2:
 	body.velocity = saved_velocity
 	if not _has_floor_below():
 		body.global_transform = start
-	_sync_from_core()
+	update_pos()
 	return _ground(body.global_position - start.origin) * tile_size
 
 
@@ -325,7 +325,7 @@ func _slide(delta: float) -> bool:
 	var collided := body.move_and_slide()
 	velocity = _ground(body.velocity) * tile_size
 	vertical_velocity = body.velocity.y
-	_sync_from_core()
+	update_pos()
 	_position_delta = _get_position_2d() - before
 	return collided
 

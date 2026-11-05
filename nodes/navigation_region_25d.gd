@@ -1,7 +1,6 @@
 @tool
 @icon("res://addons/world_25d/icons/tile_map_layer_25d.svg")
-class_name NavigationRegion25D
-extends NavigationRegion3D
+class_name NavigationRegion25D extends NavigationRegion3D
 ## The 3D navmesh of one map (one streamed region), for NavigationAgent3D on 2.5D body cores.
 ## Put it as a direct child of the map's 2D root. Press "Bake navmesh" in the inspector.
 ## The bake reads the 3D blocks, ramps, and walls of every TileMapLayer25D under the parent,
@@ -9,7 +8,7 @@ extends NavigationRegion3D
 ## the NavigationMesh next to the scene. The game never bakes: it only loads the saved file.
 ## The whole native NavigationRegion3D API stays the same.
 
-## The string values stay the same as in the old Kinsprit NavRegion25D, so saved fingerprints stay valid.
+## The saved navmesh files store these two names. A change marks every saved navmesh stale.
 const SOURCE_GROUP := &"nav_region_25d_source"
 const FINGERPRINT_META := &"source_fingerprint"
 const DEFAULT_NAME := "NavigationRegion25D"

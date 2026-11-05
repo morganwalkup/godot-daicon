@@ -27,61 +27,45 @@ var _built_level := 0
 		if grid_map: grid_map.mesh_library = library
 		mesh_library = library
 		_dirty = true
-	get():
-		return mesh_library
 @export var physics_material : PhysicsMaterial:
 	set(material):
 		if grid_map: grid_map.physics_material = material
 		if extrusion: extrusion.physics_material_override = material
 		physics_material = material
-	get():
-		return physics_material
 @export var visible_3d: bool = true:
 	set(value):
 		if grid_map: grid_map.visible = value
 		visible_3d = value
-	get():
-		return visible_3d
 
 @export_group("Height")
-## Z-step in sortable system between height levels.
+## Z-step between height levels in the draw order.
 @export var z_step : int = 10:
 	set(step):
 		z_step = step
 		_dirty = true
-	get():
-		return z_step
 ## If on, the height level is z_index / z_step (upstream behavior).
 @export var level_from_z_index: bool = true:
 	set(value):
 		level_from_z_index = value
 		_dirty = true
 		notify_property_list_changed()
-	get():
-		return level_from_z_index
 ## Height level of this layer, in blocks. Used when level_from_z_index is off.
 @export var level: int = 0:
 	set(value):
 		level = value
 		_dirty = true
-	get():
-		return level
 
 @export_group("Cell")
-@export_custom(PROPERTY_HINT_NONE, "suffix:m") var size: Vector3 = Vector3(1, 1, 1):
+@export_custom(PROPERTY_HINT_NONE, "suffix:blocks") var size: Vector3 = Vector3(1, 1, 1):
 	set(v_3):
 		if grid_map: grid_map.cell_size = v_3
 		size = v_3
-	get():
-		return size
 ## Offset of the 3D cells from the 2D tiles. The upstream plugin uses (0, 0, -0.5).
 ## Use (0, 0, 0) to put a tile's top face exactly on the tile drawn in 2D.
-@export_custom(PROPERTY_HINT_NONE, "suffix:m") var cell_offset: Vector3 = Vector3(0, 0, -0.5):
+@export_custom(PROPERTY_HINT_NONE, "suffix:blocks") var cell_offset: Vector3 = Vector3(0, 0, -0.5):
 	set(v_3):
 		cell_offset = v_3
 		_sync_origin()
-	get():
-		return cell_offset
 
 @export_group("Extrusion")
 ## Turns every 2D physics polygon of the tiles into a 3D wall on this layer's level.
@@ -89,29 +73,21 @@ var _built_level := 0
 	set(value):
 		extrude_physics = value
 		_dirty = true
-	get():
-		return extrude_physics
-@export_custom(PROPERTY_HINT_NONE, "suffix:m") var wall_height: float = 1.0:
+@export_custom(PROPERTY_HINT_NONE, "suffix:blocks") var wall_height: float = 1.0:
 	set(value):
 		wall_height = value
 		_dirty = true
-	get():
-		return wall_height
 ## 3D collision layer of the walls. 0 means: use the same layer as the blocks.
-## Put the walls on their own layer to keep them out of the whisker mask of entities.
+## Put the walls on their own layer to keep them out of the whisker mask of 2.5D bodies.
 @export_flags_3d_physics var extrusion_layer: int = 0:
 	set(value):
 		extrusion_layer = value
 		if extrusion: extrusion.collision_layer = value if value != 0 else collision_layer
-	get():
-		return extrusion_layer
 ## If on, the 2D physics of this layer is turned off, so only the 3D walls collide.
 @export var disable_2d_collision: bool = true:
 	set(value):
 		disable_2d_collision = value
 		if is_node_ready() and not Engine.is_editor_hint(): collision_enabled = not value
-	get():
-		return disable_2d_collision
 
 @export_group("Collision")
 ## 3D layers of the GridMap blocks (and of the walls while extrusion_layer is 0).
@@ -131,21 +107,15 @@ var _built_level := 0
 	set(value):
 		if grid_map: grid_map.bake_navigation = value
 		bake_navigation = value
-	get():
-		return bake_navigation
 @export_group("Transform")
 @export_custom(PROPERTY_HINT_RANGE, "-360,360,0.1,or_less,or_greater,radians") var rotation_3d: Vector3 = Vector3(0, 0, 0):
 	set(v_3):
 		if grid_map: grid_map.rotation = v_3
 		rotation_3d = v_3
-	get():
-		return rotation_3d
 @export_custom(PROPERTY_HINT_LINK, "") var scale_3d: Vector3 = Vector3(1, 1, 1):
 	set(v_3):
 		if grid_map: grid_map.scale = v_3
 		scale_3d = v_3
-	get():
-		return scale_3d
 
 #endregion
 
@@ -154,11 +124,10 @@ func _validate_property(property: Dictionary) -> void:
 
 func _ready() -> void:
 	if not tile_set:
-		self.set_y_sort_enabled(true)
-		self.tile_set = TileSet.new()
+		set_y_sort_enabled(true)
+		tile_set = TileSet.new()
 		TileMapBuilder25D.add_item_layer(tile_set)
 	if disable_2d_collision and not Engine.is_editor_hint(): collision_enabled = false
-	#Expand GridMap
 	grid_map = GridMap.new()
 	grid_map.set_name("GridMap")
 	add_child(grid_map)

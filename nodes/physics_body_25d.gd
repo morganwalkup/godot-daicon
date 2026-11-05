@@ -41,7 +41,7 @@ func move_and_collide(motion: Vector2, test_only: bool = false, safe_margin: flo
 	if not body: return null
 	if not test_only: _apply_position_write()
 	var hit := body.move_and_collide(_motion_3d(motion, motion_height), test_only, safe_margin / tile_size, recovery_as_collision)
-	if not test_only: _sync_from_core()
+	if not test_only: update_pos()
 	return KinematicCollision25D.new(hit, tile_size) if hit else null
 
 
@@ -50,8 +50,7 @@ func move_and_collide(motion: Vector2, test_only: bool = false, safe_margin: flo
 func test_move(from: Transform2D, motion: Vector2, collision: KinematicCollision25D = null, safe_margin: float = 0.08, recovery_as_collision: bool = false, max_collisions: int = 1, motion_height: float = 0.0) -> bool:
 	var body := core as PhysicsBody3D
 	if not body: return false
-	var h: float = height
-	var xform := Transform3D(body.global_basis, Vector3(from.origin.x / tile_size, h, from.origin.y / tile_size + h))
+	var xform := Transform3D(body.global_basis, _unproject(from.origin, height))
 	var hit := KinematicCollision3D.new()
 	var result := body.test_move(xform, _motion_3d(motion, motion_height), hit, safe_margin / tile_size, recovery_as_collision, max_collisions)
 	if collision:

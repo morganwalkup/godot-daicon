@@ -97,10 +97,8 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 	if footprint_size.x > 0.0 and footprint_size.y > 0.0 and not has_shape_child(CollisionShape25D.Role.COLLISION):
-		var box := BoxShape3D.new()
-		box.size = Vector3(footprint_size.x / tile_size, area_height, footprint_size.y / tile_size)
-		add_shape_3d(box, Vector3(0.0, area_height / 2.0, 0.0))
-	_parent_body = find_parent_entity(self)
+		_add_box_shape(footprint_size, area_height)
+	_parent_body = find_parent_25d(self)
 	if _parent_body:
 		_height_above_parent = stored_height
 		_last_synced = Vector2(INF, INF)
@@ -159,50 +157,48 @@ func _apply_position_write() -> void:
 		var written := global_position
 		var h: float = _parent_body.get_height() + _height_above_parent
 		if written.is_equal_approx(_last_synced) and is_equal_approx(h, core.position.y): return
-		core.position = Vector3(written.x / tile_size, h, written.y / tile_size + h)
-		_sync_from_core()
+		core.position = _unproject(written, h)
+		update_pos()
 		return
 	super._apply_position_write()
 
 
-func _owners(nodes: Array) -> Array[Node]:
-	var result: Array[Node] = []
-	for node: Node in nodes:
-		var owner_25d := from_3d(node) as Node
-		if owner_25d and not result.has(owner_25d): result.append(owner_25d)
-	return result
-
-
 func _on_body_entered(body: Node) -> void:
-	var owner_25d := from_3d(body) as Node
-	_body_counts[owner_25d] = int(_body_counts.get(owner_25d, 0)) + 1
-	if _body_counts[owner_25d] == 1: body_entered.emit(owner_25d)
+	var owner_25d := _count_enter(_body_counts, body)
+	if owner_25d: body_entered.emit(owner_25d)
 
 
 func _on_body_exited(body: Node) -> void:
-	var owner_25d := from_3d(body) as Node
-	var count: int = int(_body_counts.get(owner_25d, 0)) - 1
-	if count > 0:
-		_body_counts[owner_25d] = count
-		return
-	_body_counts.erase(owner_25d)
-	body_exited.emit(owner_25d)
+	var owner_25d := _count_exit(_body_counts, body)
+	if owner_25d: body_exited.emit(owner_25d)
 
 
 func _on_area_entered(area: Area3D) -> void:
-	var owner_25d := from_3d(area) as Node
-	_area_counts[owner_25d] = int(_area_counts.get(owner_25d, 0)) + 1
-	if _area_counts[owner_25d] == 1: area_entered.emit(owner_25d)
+	var owner_25d := _count_enter(_area_counts, area)
+	if owner_25d: area_entered.emit(owner_25d)
 
 
 func _on_area_exited(area: Area3D) -> void:
-	var owner_25d := from_3d(area) as Node
-	var count: int = int(_area_counts.get(owner_25d, 0)) - 1
+	var owner_25d := _count_exit(_area_counts, area)
+	if owner_25d: area_exited.emit(owner_25d)
+
+
+## One owner can have several 3D bodies or areas. Returns the owner on its first overlap, or null.
+func _count_enter(counts: Dictionary, node: Node) -> Node:
+	var owner_25d := from_3d(node) as Node
+	counts[owner_25d] = int(counts.get(owner_25d, 0)) + 1
+	return owner_25d if counts[owner_25d] == 1 else null
+
+
+## Returns the owner when its last overlap ends, or null.
+func _count_exit(counts: Dictionary, node: Node) -> Node:
+	var owner_25d := from_3d(node) as Node
+	var count: int = int(counts.get(owner_25d, 0)) - 1
 	if count > 0:
-		_area_counts[owner_25d] = count
-		return
-	_area_counts.erase(owner_25d)
-	area_exited.emit(owner_25d)
+		counts[owner_25d] = count
+		return null
+	counts.erase(owner_25d)
+	return owner_25d
 
 
 func _area() -> Area3D:
