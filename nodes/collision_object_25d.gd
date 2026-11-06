@@ -237,21 +237,24 @@ static func find_parent_25d(node: Node) -> CollisionObject25D:
 func update_pos() -> void:
 	_set_position_2d(_project(core.position))
 	var h: float = core.position.y
-	var bodies: Array[Node3D] = whisker.get_overlapping_bodies() if whisker else ([] as Array[Node3D])
-	if not bodies.is_empty():
-		# The lowest z of all occluders wins, so the node draws under every one of them.
-		var lowest := z_index_for_height(h)
-		for body in bodies:
-			if body == core: continue
-			var occluder_z: int
-			if body.has_meta("z_index"):
-				occluder_z = int(body.get_meta("z_index")) - 1
-			else:
-				occluder_z = int(snappedf(h + 0.5, 0.01) + 0.55) * z_step - 1
-			lowest = mini(lowest, occluder_z)
-		z_index = lowest
-	else:
-		z_index = z_index_for_height(h)
+	# Morgan disabled this during forest testing due to visual bugs on eastbound ramps.
+	# Look at this again if future ysorting / zindex bugs occur.
+	#var bodies: Array[Node3D] = whisker.get_overlapping_bodies() if whisker else ([] as Array[Node3D])
+	#if not bodies.is_empty():
+	#	# The lowest z of all occluders wins, so the node draws under every one of them.
+	#	var lowest := z_index_for_height(h)
+	#	for body in bodies:
+	#		if body == core: continue
+	#		var occluder_z: int
+	#		if body.has_meta("z_index"):
+	#			occluder_z = int(body.get_meta("z_index")) - 1
+	#		else:
+	#			occluder_z = int(snappedf(h + 0.5, 0.01) + 0.55) * z_step - 1
+	#		lowest = mini(lowest, occluder_z)
+	#	z_index = lowest
+	#else:
+	#	z_index = z_index_for_height(h)
+	z_index = z_index_for_height(h)
 	core.set_meta("z_index", z_index)
 	if _occluder: _occluder.set_meta("z_index", z_index)
 
