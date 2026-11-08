@@ -188,9 +188,11 @@ func get_ground_position_3d() -> Vector3:
 
 
 ## Puts the feet at a drawn 2D global position and a height in blocks, without physics.
-## NAN keeps the current height.
-func teleport(position_2d: Vector2, new_height: float = NAN) -> void:
-	var h: float = height if is_nan(new_height) else new_height
+## A null height keeps the current height.
+func teleport(position_2d: Vector2, new_height: Variant = null) -> void:
+	var h := height
+	if new_height != null and not is_nan(float(new_height)):
+		h = float(new_height)
 	if not core:
 		_set_position_2d(position_2d)
 		height = h

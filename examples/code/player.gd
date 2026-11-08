@@ -15,6 +15,15 @@ func _init() -> void:
 	gravity_3d = 10.0
 
 
+func _ready() -> void:
+	super._ready()
+	# Godot 4.7-dev3 calls get_blend_point_name(-1) the first time a discrete BlendSpace2D runs.
+	for state_name: String in ["Idle", "Move", "Jump", "Jump Down"]:
+		var key := "parameters/%s/closest" % state_name
+		if int(animation_tree.get(key)) < 0:
+			animation_tree.set(key, 0)
+
+
 func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return

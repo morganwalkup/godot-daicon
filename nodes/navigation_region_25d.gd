@@ -212,11 +212,16 @@ func _find_layers(placeholders: bool) -> Array[TileMapLayer25D]:
 
 
 ## Keeps this node under the parent's 2D origin, as TileMapLayer25D does with its GridMap.
+## Node3D.position always notifies, even when the vector is unchanged. A write every frame
+## updates the navigation debug mesh, and the editor then redraws forever.
 func _sync_origin() -> void:
 	var parent := get_parent() as Node2D
 	if not parent or not is_inside_tree():
 		return
-	position = Vector3(parent.global_position.x / tile_size, 0.0, parent.global_position.y / tile_size)
+	var origin := Vector3(parent.global_position.x / tile_size, 0.0, parent.global_position.y / tile_size)
+	if position.is_equal_approx(origin):
+		return
+	position = origin
 
 
 func _set_parameters(nm: NavigationMesh) -> void:

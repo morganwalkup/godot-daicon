@@ -190,8 +190,9 @@ func _update_cells(_coords: Array[Vector2i], _forced_cleanup: bool) -> void:
 func _sync_origin() -> void:
 	if not tile_set: return
 	var origin := TileMapBuilder25D.origin_3d(self, tile_set.tile_size, cell_offset)
-	if grid_map: grid_map.position = origin
-	if extrusion: extrusion.position = origin
+	# A write to Node3D.position always notifies, so the editor would redraw every frame.
+	if grid_map and not grid_map.position.is_equal_approx(origin): grid_map.position = origin
+	if extrusion and not extrusion.position.is_equal_approx(origin): extrusion.position = origin
 
 func update_grid_map() -> void:
 	_dirty = false

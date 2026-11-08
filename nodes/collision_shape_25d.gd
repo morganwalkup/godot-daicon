@@ -75,7 +75,10 @@ func _exit_tree() -> void:
 
 func _sync_shape() -> void:
 	var parent := get_parent() as CollisionObject25D
-	if _shape_3d and parent: _shape_3d.position = _local_position(parent)
+	if not _shape_3d or not parent: return
+	var local := _local_position(parent)
+	# A write to Node3D.position always notifies, so the editor would redraw every frame.
+	if not _shape_3d.position.is_equal_approx(local): _shape_3d.position = local
 
 
 func _local_position(parent: CollisionObject25D) -> Vector3:

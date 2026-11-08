@@ -133,7 +133,9 @@ func _update_shadow_projection() -> void:
 		distance = max_distance
 		hit_floor = false
 
-	position = Vector2(pivot_offset.x, (core_y - floor_y) * parent_25d.tile_size + pivot_offset.y)
+	# The position and z_index setters always call the RenderingServer, so the editor would redraw every frame.
+	var new_position := Vector2(pivot_offset.x, (core_y - floor_y) * parent_25d.tile_size + pivot_offset.y)
+	if not position.is_equal_approx(new_position): position = new_position
 	visible = hit_floor and distance <= max_distance
 	if not visible:
 		modulate.a = 0.0
@@ -143,7 +145,8 @@ func _update_shadow_projection() -> void:
 		var t := (distance - fade_start_distance) / maxf(max_distance - fade_start_distance, 0.001)
 		modulate.a = lerpf(shadow_opacity, 0.0, clampf(t, 0.0, 1.0))
 	var floor_z := int(snappedf(floor_y, 0.01) + 1.0) * parent_25d.z_step
-	z_index = mini(floor_z, parent_25d.z_index - 1)
+	var new_z := mini(floor_z, parent_25d.z_index - 1)
+	if z_index != new_z: z_index = new_z
 
 
 func _update_debug_overlay() -> void:

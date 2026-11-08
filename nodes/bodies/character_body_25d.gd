@@ -303,12 +303,14 @@ func jump(speed: float) -> void:
 
 
 ## Puts the feet at a drawn 2D global position and a height in blocks, and stops the body.
-## NAN keeps the current height. With use_gravity on, a body above the ground does not fall until
+## A null height keeps the current height. With use_gravity on, a body above the ground does not fall until
 ## a floor is under it (see AWAIT_FLOOR_FRAMES).
-func teleport(position_2d: Vector2, new_height: float = NAN) -> void:
+func teleport(position_2d: Vector2, new_height: Variant = null) -> void:
 	velocity = Vector2.ZERO
 	vertical_velocity = 0.0
-	var h: float = height if is_nan(new_height) else new_height
+	var h := height
+	if new_height != null and not is_nan(float(new_height)):
+		h = float(new_height)
 	_await_floor_frames = AWAIT_FLOOR_FRAMES if use_gravity and h > 0.05 else 0
 	if core: _body().velocity = Vector3.ZERO
 	super.teleport(position_2d, h)
